@@ -21,10 +21,9 @@ import app_admin.views as admin
 from python_final_proj.settings import STATIC_ROOT
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
-    path('admin/login', admin.login),
-    path('admin/logout', admin.logout),
-    path('admin/index', admin.index),
-    path('admin/list', admin.list),
+    path('admin/login/', admin.LoginView.as_view()),
+    path('admin/', admin.IndexView.as_view()),
+    path('admin/volunteer/', admin.VolunteerView.as_view()),
+
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': STATIC_ROOT}),
 ]

@@ -1,12 +1,34 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>登录</title>
-    <link rel="stylesheet" href="../../static/layui/css/layui.css">
-    <script type="text/javascript" src="../../static/layui/layui.js"></script>
+    <link rel="shortcut icon" href="{% static 'assert/images/favicon.ico' %}" type="image/x-icon">
+    <script type="text/javascript" src="{% static 'assert/js/jquery-3.6.0.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}">
+    <script type="text/javascript" src="{% static 'layui/layui.js' %}"></script>
 </head>
+<style>
+    body{
+        background-image: url("{% static 'assert/images/admin_login.png' %}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
 <body>
-
+    <div class="layui-row">
+        <div class="layui-col-md4"></div>
+        <div class="layui-col-md4" style="background-color: #ced4da">
+            <form class="layui-form" action="/admin/login" method="post">
+                <div class="layui-form-item">
+                    <input type="text" name="login_name" required lay-verify="required" placeholder="请输入标题" aria-label="账号输入框">
+                </div>
+            </form>
+        </div>
+        <div class="layui-col-md4"></div>
+    </div>
 </body>
 </html>
