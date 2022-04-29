@@ -1,7 +1,34 @@
-{%extends "admin/index.html" %}
- 
+{% extends "admin/index.html" %}
+
 {% block mainbody %}
+2
+    <table id="voluteer_table" lay-filter="volunteer"/>
+    <script type="text/javascript">
+        let data;
+        $.ajax({
 
-    
-
+        })
+        let table = layui.table;
+        table.render({
+            elem: '#voluteer_table',
+            url: '../api/v1/volunteer/',
+            page: true,
+            text: '查询不到数据',
+            loading: true,
+            totalRow: true,
+            title: '志愿者信息',
+            types: 'checkbox',
+            cols:[[
+                {checkbox: true, type: 'checkbox', fixed: 'left'},
+                {field: 'nick_name', title: '昵称', sort: true, fixed: 'left'},
+                {field: 'user_name', title: '姓名', sort: true, fixed: 'left'},
+                {field: 'id_card', title: '身份证号', sort: true, fixed: 'left'},
+                {field: 'user_mail', title: '邮箱', sort: true, fixed: 'left'},
+                {field: 'qq', title: 'QQ号', sort: true, fixed: 'left'},
+                {field: 'hometown', title: '籍贯', sort: true, fixed: 'left'},
+                {field: 'education', title: '学历背景', sort: true, fixed: 'left'},
+                {field: 'position', title: '职业', sort: true, fixed: 'left'},
+            ]]
+        })
+    </script>
 {% endblock %}
