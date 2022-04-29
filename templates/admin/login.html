@@ -10,25 +10,53 @@
     <script type="text/javascript" src="{% static 'layui/layui.js' %}"></script>
 </head>
 <style>
-    body{
+    body {
         background-image: url("{% static 'assert/images/admin_login.png' %}");
         background-repeat: no-repeat;
         background-position: center center;
         background-attachment: fixed;
         background-size: cover;
     }
+
+    .login-form{
+        background-color: #f0f0f0;
+        width: 30%;
+        height: 60%;
+        padding: 15px 28px 0px;
+        margin: 10% auto 0 5%;
+    }
 </style>
 <body>
-    <div class="layui-row">
-        <div class="layui-col-md4"></div>
-        <div class="layui-col-md4" style="background-color: #ced4da">
-            <form class="layui-form" action="/admin/login" method="post">
-                <div class="layui-form-item">
-                    <input type="text" name="login_name" required lay-verify="required" placeholder="请输入标题" aria-label="账号输入框">
-                </div>
-            </form>
-        </div>
-        <div class="layui-col-md4"></div>
+<form class="layui-form login-form" action="/admin/login/" method="post">
+    <div class="layui-form-item">
+        <h1 class="layui-icon-fonts-strong" style="font-weight: bold">后台管理系统</h1>
     </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" required lay-verify="required" placeholder="请输入账号"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="password" required lay-verify="required" placeholder="请输入密码"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript" src="{% static 'layui/layui.js' %}"></script>
+<script>
+    layui.use('form', function () {
+        let form = layui.form;
+    })
+</script>
 </body>
 </html>
