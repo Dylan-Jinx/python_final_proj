@@ -26,5 +26,8 @@ urlpatterns = [
     path('admin/logout/', admin.LogOutView.as_view()),
     path('volunteer/', admin.VolunteerView.as_view()),
 
+
+    path('api/v1/volunteer/', admin.VolunteerData.as_view()),
+
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': STATIC_ROOT}),
 ]

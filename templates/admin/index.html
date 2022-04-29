@@ -50,7 +50,7 @@
                 <li class="layui-nav-item layui-nav-itemed">
                     <a class="" href="javascript:;">志愿者</a>
                     <dl class="layui-nav-child">
-                        <dd><a href="javascript:;">志愿者信息</a></dd>
+                        <dd><a href="/volunteer">志愿者信息</a></dd>
                         <dd><a href="javascript:;">评分等级</a></dd>
                     </dl>
                 </li>
@@ -77,11 +77,11 @@
 
     <div class="layui-body">
         <!-- 内容主体区域 -->
-        {% block main-body %}
         <div style="padding: 15px;">
+        {% block mainbody %}
 
+        {% endblock mainbody %}
         </div>
-        {% endblock main-body %}
     </div>
 
     <div class="layui-footer">
