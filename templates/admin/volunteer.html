@@ -1,8 +1,18 @@
 {% extends "admin/index.html" %}
 
 {% block mainbody %}
-2
-    <table id="voluteer_table" lay-filter="volunteer"/>
+    <div style="padding: 15px";>
+        <div class="layui-card layui-panel">
+            <table id="voluteer_table" lay-filter="volunteer"/>
+        </div>
+    </div>
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-container">
+            <button id="addEmpInfo" class="layui-btn layui-btn-sm layui-bg-green" lay-event="add" data-bs-toggle="modal" data-bs-target="#addEmpInfoModal">添加</button>
+            <button type="button" id="deleteMoreEmpInfo" class="layui-btn layui-btn-sm layui-bg-red" lay-event="moreDeleteX">批量删除</button>
+            <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue" lay-event="reserveSelected">反选</button>
+        </div>
+    </script>
     <script type="text/javascript">
         let data;
         $.ajax({
@@ -11,13 +21,14 @@
         let table = layui.table;
         table.render({
             elem: '#voluteer_table',
-            url: '../api/v1/volunteer/',
+            url: '../volunteer?method=getAllInfo',
             page: true,
             text: '查询不到数据',
             loading: true,
             totalRow: true,
             title: '志愿者信息',
             types: 'checkbox',
+            toolbar:true,
             cols:[[
                 {checkbox: true, type: 'checkbox', fixed: 'left'},
                 {field: 'nick_name', title: '昵称', sort: true, fixed: 'left'},

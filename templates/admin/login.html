@@ -18,16 +18,23 @@
         background-size: cover;
     }
 
-    .login-form{
-        background-color: #f0f0f0;
-        width: 30%;
-        height: 60%;
-        padding: 15px 28px 0px;
-        margin: 10% auto 0 5%;
+    .login-container{
+        border-radius: 40px;
+        background-color: rgba(255,255,255,.9);
     }
+
+    .login-form{
+        {#width: 30%;#}
+        {#height: 60%;#}
+        padding: 15px 28px 0px;
+        margin: 0 auto
+    }
+
 </style>
 <body>
-<form class="layui-form login-form" action="/admin/login/" method="post">
+<div class="layui-card login-container" style="width: 40%;height: 300px;margin-top: 10%;margin-left: 5%">
+
+<form class="layui-form login-form" action="/admin/login/" method="post" >
     <div class="layui-form-item">
         <h1 class="layui-icon-fonts-strong" style="font-weight: bold">后台管理系统</h1>
     </div>
@@ -52,6 +59,7 @@
         </div>
     </div>
 </form>
+</div>
 <script type="text/javascript" src="{% static 'layui/layui.js' %}"></script>
 <script>
     layui.use('form', function () {
