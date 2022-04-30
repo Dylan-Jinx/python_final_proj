@@ -99,7 +99,7 @@ class Volunteer(models.Model):
         verbose_name = verbose_name_plural = '志愿者信息'
 
     def VolunteerReflect(obj):
-        return namedtuple('Volunteer', obj.keys())(*obj.values())
+        return namedtuple(obj.keys())(*obj.values())
 
 
 class VolunteerComment(models.Model):

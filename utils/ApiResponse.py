@@ -6,6 +6,11 @@ from django.db.models import QuerySet
 
 class ApiResponse:
 
+    def ok_simple(data: str = None, count: int = 0) -> object:
+        result = {"code": 0, "msg": '获取成功', "count": count, "data": data}
+        print(result)
+        return result
+
     def ok(msg: str, data: QuerySet = None, count: int = 0) -> object:
         if data is not None:
             result = []
@@ -25,12 +30,17 @@ class ApiResponse:
         result = {"code": 0, "msg": "操作失败", "data": None}
         return result
 
-
-
-
     def api_reponse(msg: str) -> object:
         result = {"code": 0, "msg": msg, "data": None}
         return result
+
+
+
+
+
+
+
+
 
     def api_reponse(data: QuerySet) -> object:
         try:

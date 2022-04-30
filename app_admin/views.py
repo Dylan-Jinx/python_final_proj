@@ -4,7 +4,7 @@ import uuid
 
 from django.core.paginator import Paginator
 from django.core.serializers import serialize
-from django.http import JsonResponse, QueryDict
+from django.http import JsonResponse
 from django.shortcuts import *
 from django.views import View
 
@@ -52,6 +52,9 @@ class VolunteerView(View):
         if str(request.GET.get('method')).__eq__('getAllInfo'):
             result = self.get_all_volunteer_page(request)
             return JsonResponse(result)
+        elif str(request.GET.get('method').__eq__('getVolunteerDetail')):
+            result = self.get_volunteer_detail(request)
+            return JsonResponse(result, safe=False)
         return render(request, "admin/volunteer.html")
 
     def post(self, request):
@@ -73,7 +76,7 @@ class VolunteerView(View):
         print(volunteer)
         return JsonResponse(ApiResponse.ok("操作成功"))
 
-    def get_all_volunteer_page(self, request):
+    def get_all_volunteer_page(self, request) -> object:
         try:
             page = request.GET.get("page")
             limit = request.GET.get("limit")
@@ -97,5 +100,13 @@ class VolunteerView(View):
         return ApiResponse.ok("添加成功")
 
     def update_volunteer(self, datas):
-
+        Volunteer.objects\
+            .filter(user_id=datas.get('user_id'))\
+            .update(remove_flag='1')
         return ApiResponse.ok('更新成功')
+
+    def get_volunteer_detail(self, request):
+        userId = request.GET.get('user_id')
+        volunteer = Volunteer.objects\
+            .filter(user_id=userId)
+        return ApiResponse.ok('获取成功', data=volunteer)

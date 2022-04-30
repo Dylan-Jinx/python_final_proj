@@ -27,5 +27,7 @@ urlpatterns = [
     path('volunteer/', admin.VolunteerView.as_view()),
 
 
+
+
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': STATIC_ROOT}),
 ]
