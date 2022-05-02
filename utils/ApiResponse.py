@@ -18,12 +18,13 @@ class ApiResponse:
             print(data)
             for temp in data_dict:
                 result.append(temp["fields"])
-            for temp in data_dict:
-                for t in result:
-                    t["id"] = temp["pk"]
+            # for temp in data_dict:
+            #     for t in result:
+            #         t["id"] = temp["pk"]
             result = {"code": 0, "msg": msg, "count": count, "data": result}
         else:
             result = {"code": 0, "msg": msg, "count": 0, "data": None}
+        print(result)
         return result
 
     def error(self) -> object:

@@ -1,25 +1,45 @@
 {% extends "admin/index.html" %}
 
 {% block mainbody %}
-    <div style="padding: 15px";>
-        <div class="layui-card layui-panel">
-            <table id="voluteer_table" lay-filter="volunteer"/>
+    <form class="layui-form" action="">
+        <div class=" layui-form-item layui-row layui-col-space15">
+            <div class="layui-col-md1">
+                <label class="layui-form-label" style="padding: 9px 1px;">查询条件</label>
+            </div>
+            <div class="layui-col-md3">
+                <input type="text" name="queryVolName" id="queryVolName" placeholder="请输入志愿者姓名（支持模糊查询）"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-col-md2">
+                <button id="queryBtn" type="button" class="layui-btn layui-bg-blue"
+                        onclick="complexQuery()">查询
+                </button>
+                <button class="layui-btn layui-bg-orange" type="reset">重置</button>
+            </div>
         </div>
+    </form>
+
+    <div class="layui-card layui-panel">
+        <table id="voluteer_table" lay-filter="volunteer"/>
     </div>
     <script type="text/html" id="toolbarDemo">
         <div class="layui-btn-container">
-            <button id="addEmpInfo" class="layui-btn layui-btn-sm layui-bg-green" lay-event="add" data-bs-toggle="modal" data-bs-target="#addEmpInfoModal">添加</button>
-            <button type="button" id="deleteMoreEmpInfo" class="layui-btn layui-btn-sm layui-bg-red" lay-event="moreDeleteX">批量删除</button>
-            <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue" lay-event="reserveSelected">反选</button>
+            <button id="addEmpInfo" class="layui-btn layui-btn-sm layui-bg-green" lay-event="add" data-bs-toggle="modal"
+                    data-bs-target="#addEmpInfoModal">添加
+            </button>
+            <button type="button" id="deleteMoreEmpInfo" class="layui-btn layui-btn-sm layui-bg-red"
+                    lay-event="moreDeleteX">批量删除
+            </button>
+            <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue"
+                    lay-event="reserveSelected">反选
+            </button>
         </div>
     </script>
+    {#  渲染数据表格以及操作  #}
     <script type="text/javascript">
         let data;
-        $.ajax({
-
-        })
-        let table = layui.table;
-        table.render({
+        let mainTable = layui.table;
+        mainTable.render({
             elem: '#voluteer_table',
             url: '../volunteer?method=getAllInfo',
             page: true,
@@ -28,8 +48,8 @@
             totalRow: true,
             title: '志愿者信息',
             types: 'checkbox',
-            toolbar:true,
-            cols:[[
+            toolbar: true,
+            cols: [[
                 {checkbox: true, type: 'checkbox', fixed: 'left'},
                 {field: 'nick_name', title: '昵称', sort: true, fixed: 'left'},
                 {field: 'user_name', title: '姓名', sort: true, fixed: 'left'},
@@ -42,4 +62,29 @@
             ]]
         })
     </script>
+
+    {#  查询代码  #}
+    <script type="text/javascript">
+        function complexQuery() {
+            var DISABLED = 'layui-btn-disabled';
+            $('#queryVolName').addClass(DISABLED);
+            $('#queryVolName').attr('disabled', 'disabled');
+            let queryVolName = $('#queryVolName').val()
+            console.log(queryVolName)
+            mainTable.reload('voluteer_table', {
+                url: '../volunteer?method=searchVolunteer',
+                page: {
+                    curr: 1
+                },
+                where:{
+                    queryVolName:queryVolName
+                }
+            }, true)
+            $('#queryVolName').removeClass(DISABLED);
+            $('#queryVolName').removeAttr('disabled');
+            $('#queryBtn').removeClass(DISABLED);
+            $('#queryBtn').removeAttr('disabled');
+        }
+    </script>
+
 {% endblock %}
