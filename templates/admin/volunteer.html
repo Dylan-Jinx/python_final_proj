@@ -1,33 +1,121 @@
 {% extends "admin/index.html" %}
-
+{% load static %}
 {% block mainbody %}
-    <form class="layui-form" action="">
-        <div class=" layui-form-item layui-row layui-col-space15">
-            <div class="layui-col-md1">
-                <label class="layui-form-label" style="padding: 9px 1px;">查询条件</label>
-            </div>
-            <div class="layui-col-md3">
-                <input type="text" name="queryVolName" id="queryVolName" placeholder="请输入志愿者姓名（支持模糊查询）"
-                       autocomplete="off" class="layui-input">
-            </div>
-            <div class="layui-col-md2">
-                <button id="queryBtn" type="button" class="layui-btn layui-bg-blue"
-                        onclick="complexQuery()">查询
-                </button>
-                <button class="layui-btn layui-bg-orange" type="reset">重置</button>
-            </div>
-        </div>
-    </form>
+    <style>
+        .detailTableLabel {
+            font-size: 32px;
+            font-weight: bolder;
+            text-align: center;
+            height: 120px;
+        }
 
-    <div class="layui-card layui-panel">
-        <table id="voluteer_table" lay-filter="volunteer"/>
+        .rowDetailLabel {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            height: 70px;
+        }
+
+        .rowDetailInfo {
+            font-size: 16px;
+            text-align: center;
+            height: 70px;
+        }
+
+        .rowDetailImage {
+            width: 200px;
+            height: 70px;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .rowDetailImage img {
+            width: 200px;
+        }
+    </style>
+    <div class="layui-row layui-card">
+        <form class="layui-panel layui-form" action="">
+            <div class=" layui-form-item layui-row layui-col-space15">
+                <div class="layui-col-md1">
+                    <label class="layui-form-label" style="padding: 9px 1px;">查询条件</label>
+                </div>
+                <div class="layui-col-md3">
+                    <input type="text" name="queryVolName" id="queryVolName" placeholder="请输入志愿者姓名（支持模糊查询）"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-col-md2">
+                    <button id="queryBtn" type="button" class="layui-btn layui-bg-blue"
+                            onclick="complexQuery()">查询
+                    </button>
+                    <button class="layui-btn layui-bg-orange" type="reset" onclick="mainTableReloadAllDatas()">重置
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="layui-card">
+            <table id="voluteer_table" lay-filter="volunteer"/>
+        </div>
+        {#详细信息#}
+        <div class="layui-panel" style="align-items: center;margin: 0 auto">
+            <table id="detailTable" lay-filter="volDetail" border="1">
+                <thead>
+                <tr>
+                    <th class="detailTableLabel" colspan="20" align="center">志愿者详细信息表</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="rowDetailLabel" width=220 colspan="3">志愿服务唯一标识号</td>
+                    <td class="rowDetailInfo" colspan="10" id="user_id"></td>
+                </tr>
+                <tr>
+                    <td class="rowDetailLabel" width=60>昵称</td>
+                    <td class="rowDetailInfo" id="nick_name" width=80></td>
+                    <td class="rowDetailLabel" width="60">姓名</td>
+                    <td class="rowDetailInfo" id="user_name" width="150">
+                    </th>
+                    <td class="rowDetailLabel" width=120>手机号码</td>
+                    <td class="rowDetailInfo" id="phone" width=120>
+                    </th>
+                    <td class="rowDetailLabel" width=60>邮箱</td>
+                    <td class="rowDetailInfo" id="user_mail" width=240>
+                    </th>
+                    <td class="rowDetailImage" rowspan="4"><img alt="图片"
+                                                                src="{% static 'assert/images/default_icon.png' %}">
+                    </td>
+                    <td class="rowDetailInfo">
+                    </th>
+                </tr>
+                <tr>
+                    <td class="rowDetailLabel" width=120>籍贯</td>
+                    <td class="rowDetailInfo" id="hometown" width=120>
+                    </th>
+                    <td class="rowDetailLabel" width=90>身份证号</td>
+                    <td class="rowDetailInfo" width=180 id="id_card"></td>
+                    <td class="rowDetailLabel" width=60>QQ</td>
+                    <td class="rowDetailInfo" width=160 id="qq">
+                    </th>
+                    <td class="rowDetailLabel" width="80">微信号</td>
+                    <td class="rowDetailInfo" width="130" id="wechat">
+                    </th>
+                </tr>
+                <tr>
+                    <td class="rowDetailLabel" width=60>职业</td>
+                    <td class="rowDetailInfo" width=130 id="position" colspan="3"></td>
+                    <td class="rowDetailLabel" width="120">服务区域</td>
+                    <td class="rowDetailInfo" width="150" id="service_area" colspan="3"></td>
+                </tr>
+                <tr>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <script type="text/html" id="toolbarDemo">
+
+    <script type="text/html" id="mainTableToolBarDemo">
         <div class="layui-btn-container">
-            <button id="addEmpInfo" class="layui-btn layui-btn-sm layui-bg-green" lay-event="add" data-bs-toggle="modal"
-                    data-bs-target="#addEmpInfoModal">添加
-            </button>
-            <button type="button" id="deleteMoreEmpInfo" class="layui-btn layui-btn-sm layui-bg-red"
+            <button type="button" id="deleteMore" class="layui-btn layui-btn-sm layui-bg-red"
                     lay-event="moreDeleteX">批量删除
             </button>
             <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue"
@@ -35,6 +123,19 @@
             </button>
         </div>
     </script>
+
+
+    <script type="text/html" id="mainTableRowTool">
+        <button id="editEmpInfo" class="layui-btn layui-btn-sm layui-bg-blue" lay-event="detail"
+                data-bs-toggle="modal" data-bs-target="#empInfoModal">查看详细
+        </button>
+        <button id="editEmpInfo" class="layui-btn layui-btn-sm layui-bg-orange" lay-event="update"
+                data-bs-toggle="modal" data-bs-target="#empInfoModal">编辑
+        </button>
+        <button type="button" id="delVolInfo" class="layui-btn layui-btn-sm layui-bg-red" lay-event="deleteX">删除
+        </button>
+    </script>
+
     {#  渲染数据表格以及操作  #}
     <script type="text/javascript">
         let data;
@@ -48,18 +149,47 @@
             totalRow: true,
             title: '志愿者信息',
             types: 'checkbox',
-            toolbar: true,
+            toolbar: '#mainTableToolBarDemo',
             cols: [[
                 {checkbox: true, type: 'checkbox', fixed: 'left'},
-                {field: 'nick_name', title: '昵称', sort: true, fixed: 'left'},
-                {field: 'user_name', title: '姓名', sort: true, fixed: 'left'},
-                {field: 'id_card', title: '身份证号', sort: true, fixed: 'left'},
-                {field: 'user_mail', title: '邮箱', sort: true, fixed: 'left'},
-                {field: 'qq', title: 'QQ号', sort: true, fixed: 'left'},
-                {field: 'hometown', title: '籍贯', sort: true, fixed: 'left'},
-                {field: 'education', title: '学历背景', sort: true, fixed: 'left'},
-                {field: 'position', title: '职业', sort: true, fixed: 'left'},
+                {field: 'user_id', title: '用户id', sort: true, fixed: 'left', hide: true},
+                {field: 'nick_name', title: '昵称', sort: true, fixed: 'left', width: 120},
+                {field: 'user_name', title: '姓名', sort: true, fixed: 'left', width: 100},
+                {field: 'id_card', title: '身份证号', sort: true, fixed: 'left', width: 200},
+                {field: 'user_mail', title: '邮箱', sort: true, fixed: 'left', width: 240},
+                {field: 'qq', title: 'QQ号', sort: true, fixed: 'left', width: 140},
+                {field: 'phone', title: '手机号码', sort: true, fixed: 'left', width: 140},
+                {#{field: 'hometown', title: '籍贯', sort: true, fixed: 'left', width: 140},#}
+                {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
             ]]
+        })
+    </script>
+
+    {#每行表格的后台操作#}
+    <script type="text/javascript">
+        mainTable.on('tool(volunteer)', function (obj) {
+            let layEvent = obj.event;
+            let rowData = obj.data;
+            let id = rowData.user_id;
+            console.log(layEvent);
+            console.log(rowData)
+            console.log(id);
+            switch (layEvent) {
+                case "detail":
+                    console.log("detail method....")
+                    volDetail(id)
+                    break;
+                case "update":
+                    console.log("update method.....")
+                    volDelete(id)
+                    break;
+                case "delete":
+                    console.log("delete method.....")
+                    break;
+
+            }
+
+
         })
     </script>
 
@@ -69,15 +199,15 @@
             var DISABLED = 'layui-btn-disabled';
             $('#queryVolName').addClass(DISABLED);
             $('#queryVolName').attr('disabled', 'disabled');
-            let queryVolName = $('#queryVolName').val()
-            console.log(queryVolName)
+            let queryVolName = $('#queryVolName').val();
+            console.log(queryVolName);
             mainTable.reload('voluteer_table', {
                 url: '../volunteer?method=searchVolunteer',
                 page: {
                     curr: 1
                 },
-                where:{
-                    queryVolName:queryVolName
+                where: {
+                    queryVolName: queryVolName
                 }
             }, true)
             $('#queryVolName').removeClass(DISABLED);
@@ -85,6 +215,72 @@
             $('#queryBtn').removeClass(DISABLED);
             $('#queryBtn').removeAttr('disabled');
         }
+
+        function mainTableReloadAllDatas() {
+            mainTable.reload('voluteer_table', {
+                url: '../volunteer?method=searchVolunteer',
+                page: {
+                    curr: 1
+                },
+                where: {
+                    queryVolName: ''
+                }
+            }, true)
+        }
     </script>
 
+    {#  每行工具栏操作函数  #}
+    <script type="text/javascript">
+        {#详细信息显示#}
+
+        function volDetail(userId) {
+            $.ajax({
+                url: '../volunteer?method=searchVolunteerById&user_id=' + userId,
+                method: 'GET',
+                cache: false,
+                dataType: "json",
+                success: function (datas) {
+                    let msg = datas.msg;
+                    let data = datas.data[0];
+                    console.log(data)
+                    $('#user_id').text(data.user_id);
+                    $('#nick_name').text(data.nick_name);
+                    $('#user_name').text(data.user_name);
+                    $('#id_card').text(data.id_card);
+                    $('#phone').text(data.phone);
+                    $('#user_mail').text(data.user_mail);
+                    $('#qq').text(data.qq);
+                    $('#wechat').text(data.wechat);
+                    $('#hometown').text(data.hometown);
+                    $('#position').text(data.position);
+                    $('#service_area').text(data.service_area);
+                    layer.msg(msg, {time: 2000, anim: 5, icon: 1});
+                },
+            })
+        }
+
+        {#删除信息#}
+        function volDelete(id) {
+            $.ajax({
+                url: 'http://127.0.0.1:8000/volunteer/',
+            })
+        }
+    </script>
+
+    <script type="text/javascript">
+        function printPreview(oper) {
+            if (oper < 10) {
+                bdhtml = window.document.body.innerHTML;//获取当前页的html代码
+                sprnstr = "<!--startprint" + oper + "-->";//设置打印开始区域
+                eprnstr = "<!--endprint" + oper + "-->";//设置打印结束区域
+                prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //从开始代码向后取html
+                prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr));//从结束代码向前取html
+                window.document.body.innerHTML = prnhtml;
+                window.print();
+                window.document.body.innerHTML = bdhtml;
+            } else {
+                window.print();
+            }
+        }
+    </script>
 {% endblock %}

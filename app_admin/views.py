@@ -3,7 +3,6 @@ import json
 import uuid
 
 from django.core.paginator import Paginator
-from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.shortcuts import *
 from django.views import View
@@ -58,6 +57,9 @@ class VolunteerView(View):
         elif str(request.GET.get('method')).__eq__('searchVolunteer'):
             result = self.search_volunteer(request)
             return JsonResponse(result, safe=False)
+        elif str(request.GET.get('method')).__eq__('searchVolunteerById'):
+            result = self.search_volunteer_by_id(request)
+            return JsonResponse(result, safe=False)
         return render(request, "admin/volunteer.html")
 
     def post(self, request):
@@ -75,6 +77,7 @@ class VolunteerView(View):
         DELETE = json.loads(request.body)
         print(DELETE)
         id = DELETE.get('user_id')
+        print(id)
         volunteer = Volunteer.objects.filter(user_id=id).delete()
         print(volunteer)
         return JsonResponse(ApiResponse.ok("操作成功"))
@@ -121,3 +124,8 @@ class VolunteerView(View):
         limit = request.GET.get("limit")
         page_result = Paginator(volunteer, limit)
         return ApiResponse.ok('获取成功', page_result.page(number=page), page_result.count)
+
+    def search_volunteer_by_id(self, request) -> object:
+        userId = request.GET.get('user_id')
+        volunteer = Volunteer.objects.filter(user_id=userId)
+        return ApiResponse.ok('获取成功', volunteer)
