@@ -3,7 +3,7 @@ import json
 import uuid
 
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.shortcuts import *
 from django.views import View
 
@@ -74,13 +74,13 @@ class VolunteerView(View):
         return HttpResponse("Put 请求")
 
     def delete(self, request):
-        DELETE = json.loads(request.body)
-        print(DELETE)
-        id = DELETE.get('user_id')
-        print(id)
-        volunteer = Volunteer.objects.filter(user_id=id).delete()
-        print(volunteer)
-        return JsonResponse(ApiResponse.ok("操作成功"))
+        method = request.GET.get('method')
+        if str(method).__eq__('deleteById'):
+            self.delete_by_id(request)
+            return JsonResponse(ApiResponse.ok("操作成功"))
+        elif str(method).__eq__('deleteByIds'):
+            self.delete_by_ids(request)
+            return JsonResponse(ApiResponse.ok("操作成功"))
 
     def get_all_volunteer_page(self, request) -> object:
         try:
@@ -129,3 +129,13 @@ class VolunteerView(View):
         userId = request.GET.get('user_id')
         volunteer = Volunteer.objects.filter(user_id=userId)
         return ApiResponse.ok('获取成功', volunteer)
+
+    def delete_by_id(self, request):
+        id = request.GET.get('user_id')
+        Volunteer.objects.filter(user_id=id).delete()
+
+    def delete_by_ids(self, request):
+        body = request.body
+        list = QueryDict(body).values()
+        print(list)
+

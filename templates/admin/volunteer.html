@@ -151,7 +151,7 @@
             types: 'checkbox',
             toolbar: '#mainTableToolBarDemo',
             cols: [[
-                {checkbox: true, type: 'checkbox', fixed: 'left'},
+                {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
                 {field: 'user_id', title: '用户id', sort: true, fixed: 'left', hide: true},
                 {field: 'nick_name', title: '昵称', sort: true, fixed: 'left', width: 120},
                 {field: 'user_name', title: '姓名', sort: true, fixed: 'left', width: 100},
@@ -171,22 +171,19 @@
             let layEvent = obj.event;
             let rowData = obj.data;
             let id = rowData.user_id;
-            console.log(layEvent);
-            console.log(rowData)
-            console.log(id);
+            {#console.log(layEvent);#}
+            {#console.log(rowData)#}
+            {#console.log(id);#}
             switch (layEvent) {
                 case "detail":
-                    console.log("detail method....")
                     volDetail(id)
                     break;
                 case "update":
                     console.log("update method.....")
-                    volDelete(id)
                     break;
                 case "deleteX":
-                    console.log("delete method.....")
+                    volDelete(id)
                     break;
-
             }
 
 
@@ -229,9 +226,30 @@
         }
     </script>
 
+    {#  头部工具栏函数  #}
+    <script type="text/javascript">
+        mainTable.on('toolbar(volunteer)', function (obj) {
+            let checkStatus = mainTable.checkStatus(obj.config.id);
+            let event = obj.event;
+            console.log(checkStatus);
+            console.log(event);
+
+            switch (event) {
+                case "reserveSelected":
+                    console.log("reserveSelected event ....")
+
+                    break;
+                case "moreDeleteX":
+                    moreDeleteVol(checkStatus);
+                    break;
+            }
+        })
+    </script>
+
     {#  每行工具栏操作函数  #}
     <script type="text/javascript">
         {#详细信息显示#}
+
         function volDetail(userId) {
             $.ajax({
                 url: '../volunteer?method=searchVolunteerById&user_id=' + userId,
@@ -259,19 +277,45 @@
         }
 
         {#删除信息#}
+
         function volDelete(id) {
-            layer.
-            $.ajax({
-                url: 'http://127.0.0.1:8000/volunteer/',
-                method: "DELETE",
-                data:{
-                    "user_id":id
-                },
-                dataType: "json",
-                success: function (datas){
-                    layer.msg(datas.msg,{time:2000, anim: 5, icon: 1});
-                    mainTableReloadAllDatas();
-                }
+            layer.confirm('你确定要删除吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
+                layer.close(index)
+                $.ajax({
+                    url: 'http://127.0.0.1:8000/volunteer?method=deleteById&user_id=' + id,
+                    method: "DELETE",
+                    contentType: 'application/json',
+                    data: {
+                        user_id: id
+                    },
+                    dataType: "json",
+                    success: function (datas) {
+                        layer.msg(datas.msg, {time: 2000, anim: 5, icon: 1});
+                        mainTableReloadAllDatas();
+                    }
+                })
+            })
+        }
+
+        {#删除多条消息#}
+        function moreDeleteVol(checkStatus) {
+            console.log(checkStatus);
+            let idList = [];
+            checkStatus.data.forEach((item, index)=>{
+                {#console.log(item.user_id);#}
+                {#console.log(index)#}
+                idList.push(item.user_id)
+            });
+            layer.confirm('确定要删除'+idList.length+'条数据吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
+                layer.close(index)
+                $.ajax({
+                    url: 'http://127.0.0.1:8000/volunteer?method=deleteByIds',
+                    method: "DELETE",
+                    data: {
+                        "ids":idList
+                    },
+                    dataType: "json",
+                })
             })
         }
     </script>
