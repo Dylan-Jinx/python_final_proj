@@ -5,9 +5,9 @@ from minio import Minio
 
 
 class MinioStore:
-
+    # host='42.192.5.34:9000',
     def __init__(self,
-                 host='42.192.5.34:9000',
+                 host='localhost:9000',
                  access_key='minioadmin',
                  secret_key='cSLxZqgpn2$DcHxb4Kx&SD@msZZOPG6s7UpF@hPYcMywsyLW5nhw9QZabsSlz0gb',
                  bucket="pythonfinalproject",

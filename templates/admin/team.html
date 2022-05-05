@@ -41,7 +41,7 @@
                     <label class="layui-form-label" style="padding: 9px 1px;">查询条件</label>
                 </div>
                 <div class="layui-col-md3">
-                    <input type="text" name="queryVolName" id="queryVolName" placeholder="请输入志愿者姓名（支持模糊查询）"
+                    <input type="text" name="queryVolName" id="queryVolName" placeholder="请输入志愿者队伍名（支持模糊查询）"
                            autocomplete="off" class="layui-input">
                 </div>
                 <div class="layui-col-md2">
@@ -55,61 +55,6 @@
         </form>
         <div class="layui-card">
             <table id="voluteer_table" lay-filter="volunteer"/>
-        </div>
-        {#详细信息#}
-        <div class="layui-panel" style="align-items: center;margin: 0 auto">
-            <table id="detailTable" lay-filter="volDetail" border="1">
-                <thead>
-                <tr>
-                    <th class="detailTableLabel" colspan="20" align="center">志愿者详细信息表</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="rowDetailLabel" width=220 colspan="3">志愿服务唯一标识号</td>
-                    <td class="rowDetailInfo" colspan="10" id="user_id"></td>
-                </tr>
-                <tr>
-                    <td class="rowDetailLabel" width=60>昵称</td>
-                    <td class="rowDetailInfo" id="nick_name" width=80></td>
-                    <td class="rowDetailLabel" width="60">姓名</td>
-                    <td class="rowDetailInfo" id="user_name" width="150">
-                    </th>
-                    <td class="rowDetailLabel" width=120>手机号码</td>
-                    <td class="rowDetailInfo" id="phone" width=120>
-                    </th>
-                    <td class="rowDetailLabel" width=60>邮箱</td>
-                    <td class="rowDetailInfo" id="user_mail" width=240>
-                    </th>
-                    <td class="rowDetailImage" rowspan="4"><img alt="图片"
-                                                                src="{% static 'assert/images/default_icon.png' %}">
-                    </td>
-                    <td class="rowDetailInfo">
-                    </th>
-                </tr>
-                <tr>
-                    <td class="rowDetailLabel" width=120>籍贯</td>
-                    <td class="rowDetailInfo" id="hometown" width=120>
-                    </th>
-                    <td class="rowDetailLabel" width=90>身份证号</td>
-                    <td class="rowDetailInfo" width=180 id="id_card"></td>
-                    <td class="rowDetailLabel" width=60>QQ</td>
-                    <td class="rowDetailInfo" width=160 id="qq">
-                    </th>
-                    <td class="rowDetailLabel" width="80">微信号</td>
-                    <td class="rowDetailInfo" width="130" id="wechat">
-                    </th>
-                </tr>
-                <tr>
-                    <td class="rowDetailLabel" width=60>职业</td>
-                    <td class="rowDetailInfo" width=130 id="position" colspan="3"></td>
-                    <td class="rowDetailLabel" width="120">服务区域</td>
-                    <td class="rowDetailInfo" width="150" id="service_area" colspan="3"></td>
-                </tr>
-                <tr>
-                </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 
@@ -126,11 +71,11 @@
 
 
     <script type="text/html" id="mainTableRowTool">
-        <button id="editVol" class="layui-btn layui-btn-sm layui-bg-blue" lay-event="detail"
+        <button id="detailTeam" class="layui-btn layui-btn-sm layui-bg-blue" lay-event="detail"
                 data-bs-toggle="modal" data-bs-target="#empInfoModal">查看详细
         </button>
-        <button id="editVol" class="layui-btn layui-btn-sm layui-bg-orange" lay-event="update"
-                data-bs-toggle="modal" data-bs-target="#empInfoModal">编辑
+        <button id="editTeam" class="layui-btn layui-btn-sm layui-bg-orange" lay-event="update"
+                data-bs-toggle="modal" data-bs-target="#teamModal">编辑
         </button>
         <button id="resetPwd" class="layui-btn layui-btn-sm layui-bg-cyan" lay-event="resetPwd"
                 data-bs-toggle="modal" data-bs-target="#empInfoModal">重置密码
@@ -145,7 +90,7 @@
         let mainTable = layui.table;
         mainTable.render({
             elem: '#voluteer_table',
-            url: '../volunteer?method=getAllInfo',
+            url: '../team?method=getAllInfo&remove_flag=0',
             page: true,
             text: '查询不到数据',
             loading: true,
@@ -155,13 +100,13 @@
             toolbar: '#mainTableToolBarDemo',
             cols: [[
                 {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
-                {field: 'user_id', title: '用户id', sort: true, fixed: 'left', hide: true},
-                {field: 'nick_name', title: '昵称', sort: true, fixed: 'left', width: 120},
-                {field: 'user_name', title: '姓名', sort: true, fixed: 'left', width: 100},
-                {field: 'id_card', title: '身份证号', sort: true, fixed: 'left', width: 200},
-                {field: 'user_mail', title: '邮箱', sort: true, fixed: 'left', width: 240},
-                {field: 'qq', title: 'QQ号', sort: true, fixed: 'left', width: 140},
-                {field: 'phone', title: '手机号码', sort: true, fixed: 'left', width: 140},
+                {field: 'team_id', title: '队伍id', sort: true, fixed: 'left', hide: true},
+                {field: 'team_name', title: '志愿队伍名称', sort: true, fixed: 'left', width: 120},
+                {field: 'team_concact', title: '联系人', sort: true, fixed: 'left', width: 100},
+                {field: 'team_concact_phone', title: '联系电话', sort: true, fixed: 'left', width: 200},
+                {field: 'team_intro', title: '介绍', sort: true, fixed: 'left', width: 240},
+                {field: 'team_area', title: '所属区域', sort: true, fixed: 'left', width: 140},
+                {field: 'team_create_time', title: '创建时间', sort: true, fixed: 'left', width: 180},
                 {#{field: 'hometown', title: '籍贯', sort: true, fixed: 'left', width: 140},#}
                 {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
             ]]
@@ -173,10 +118,10 @@
         mainTable.on('tool(volunteer)', function (obj) {
             let layEvent = obj.event;
             let rowData = obj.data;
-            let id = rowData.user_id;
-            {#console.log(layEvent);#}
-            {#console.log(rowData)#}
-            {#console.log(id);#}
+            let id = rowData.team_id;
+            console.log(layEvent);
+            console.log(rowData)
+            console.log(id);
             switch (layEvent) {
                 case "detail":
                     volDetail(id)
@@ -221,7 +166,7 @@
 
         function mainTableReloadAllDatas() {
             mainTable.reload('voluteer_table', {
-                url: '../volunteer?method=searchVolunteer',
+                url: '../team?method=getAllInfo&remove_flag=0',
                 page: {
                     curr: 1
                 },
@@ -255,16 +200,15 @@
     {#  每行工具栏操作函数  #}
     <script type="text/javascript">
         {#详细信息显示#}
-
-        function volDetail(userId) {
+        function volDetail(teamId) {
             $.ajax({
-                url: '../volunteer?method=searchVolunteerById&user_id=' + userId,
+                url: '../team?method=getVolunteerTeamDetailByTeamId&team_id=' + teamId,
                 method: 'GET',
                 cache: false,
                 dataType: "json",
                 success: function (datas) {
                     let msg = datas.msg;
-                    let data = datas.data[0];
+                    let data = datas.data[0]
                     console.log(data)
                     $('#user_id').text(data.user_id);
                     $('#nick_name').text(data.nick_name);
@@ -288,12 +232,9 @@
             layer.confirm('你确定要删除吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
                 layer.close(index)
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/volunteer?method=deleteById&user_id=' + id,
+                    url: 'http://127.0.0.1:8000/team?method=deleteById&team_id=' + id,
                     method: "DELETE",
                     contentType: 'application/json',
-                    data: {
-                        user_id: id
-                    },
                     dataType: "json",
                     success: function (datas) {
                         layer.msg(datas.msg, {time: 2000, anim: 5, icon: 1});
@@ -305,10 +246,10 @@
 
 
         function resetPwd(id) {
-            layer.confirm('确定要重置该账号的密码吗？', {icon: 3, btn: ['确定', '取消']}, function (index) {
+            layer.confirm('确定要重置该团体账号的密码吗？', {icon: 3, btn: ['确定', '取消']}, function (index) {
                 layer.close(index)
                 $.ajax({
-                    url: '../volunteer?method=resetPwd&id='+id,
+                    url: '../team?method=resetPwd&id='+id,
                     method: "GET",
                     success: function (datas) {
                         layer.msg(datas.msg, {time: 2000, anim: 5, icon: 1});
@@ -326,12 +267,12 @@
             checkStatus.data.forEach((item, index) => {
                 {#console.log(item.user_id);#}
                 {#console.log(index)#}
-                idList.push(item.user_id)
+                idList.push(item.team_id)
             });
             layer.confirm('确定要删除' + idList.length + '条数据吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
                 layer.close(index)
                 $.ajax({
-                    url: '../volunteer?method=deleteByIds',
+                    url: '../team?method=deleteByIds',
                     method: "DELETE",
                     data: {
                         ids: idList

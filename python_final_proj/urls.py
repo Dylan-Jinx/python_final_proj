@@ -16,8 +16,8 @@ Including another URLconf
 from django.urls import path, re_path
 from django.views.static import serve
 
-import app_web.views as web
 import app_admin.views as admin
+import app_web.views as web
 from python_final_proj.settings import STATIC_ROOT
 
 urlpatterns = [
@@ -25,9 +25,12 @@ urlpatterns = [
     path('admin/login/', admin.LoginView.as_view()),
     path('admin/logout/', admin.LogOutView.as_view()),
     path('volunteer/', admin.VolunteerView.as_view()),
+    path('team/', admin.VolunteerTeamView.as_view()),
+    path('regioncode/', admin.ThreeLevelProvinceAndCityAndAreaLinker.as_view()),
 
 
+    path('index/', web.AppIndex.as_view()),
 
-
+    re_path(r'^$', web.AppIndex.as_view()),
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': STATIC_ROOT}),
 ]

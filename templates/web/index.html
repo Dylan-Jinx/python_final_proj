@@ -1,10 +1,47 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>志愿者注册登记预约分配系统</title>
+    <link rel="shortcut icon" href="{% static 'assert/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <script type="text/javascript" src="{% static 'assert/js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+    <style>
+        #autoRoundGraph {
+
+        }
+    </style>
+    <script>
+        let turnVal = 0.0;
+        let horizonMoveVal = 0.0;
+        let step = 5
+
+        function start(n) {
+            console.log('233')
+            $("#start").val(n);
+            var ref = setInterval(function () {
+                var start = Number($("#start").val());
+                turnVal = turnVal + 0.01;
+                horizonMoveVal = horizonMoveVal + step;
+                $('#autoRoundGraph').attr('style','width: auto; height: 30rem; transform: rotate('+turnVal+'turn)')
+                console.log(turnVal);
+                if (start == 0) {
+                    clearInterval(ref);
+                }
+            }, 10);
+        }
+
+
+    </script>
 </head>
+
 <body>
+<img alt="test" style="width: auto; height: 30rem; transform: rotate(0.0turn) translateX(10px)" src="{% static '/firefox-logo.svg' %}"
+     id="autoRoundGraph"/>
+<button class="start" onclick="start(1)">开始</button>
+<button class="timeout" onclick="start(0)">暂停</button>
 
 </body>
 </html>

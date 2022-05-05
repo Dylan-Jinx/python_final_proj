@@ -98,9 +98,6 @@ class Volunteer(models.Model):
         db_table = 'volunteer'
         verbose_name = verbose_name_plural = '志愿者信息'
 
-    def VolunteerReflect(obj):
-        return namedtuple(obj.keys())(*obj.values())
-
 
 class VolunteerComment(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -145,6 +142,7 @@ class VolunteerRank(models.Model):
 
 class VolunteerTeam(models.Model):
     team_id = models.CharField(max_length=255, blank=True, null=True)
+    team_name = models.CharField(max_length=255, blank=True, null=True)
     team_login_name = models.CharField(max_length=255, blank=True, null=True)
     team_pwd = models.CharField(max_length=255, blank=True, null=True)
     team_concact = models.CharField(max_length=255, blank=True, null=True)
@@ -153,7 +151,38 @@ class VolunteerTeam(models.Model):
     team_intro = models.TextField(blank=True, null=True)
     team_create_time = models.DateTimeField(blank=True, null=True)
     remove_flag = models.CharField(max_length=255, blank=True, null=True)
+    team_area = models.CharField(max_length=255, blank=True, null=True)
+    remark = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'volunteer_team'
+
+
+class Province(models.Model):
+    code = models.CharField(max_length=6)
+    name = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = 'province'
+
+
+class City(models.Model):
+    code = models.CharField(max_length=6)
+    name = models.CharField(max_length=20)
+    provincecode = models.CharField(max_length=6)
+
+    class Meta:
+        managed = False
+        db_table = 'city'
+
+
+class Area(models.Model):
+    code = models.CharField(max_length=6)
+    name = models.CharField(max_length=20)
+    citycode = models.CharField(max_length=6)
+
+    class Meta:
+        managed = False
+        db_table = 'area'
