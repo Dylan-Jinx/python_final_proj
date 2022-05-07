@@ -1,0 +1,344 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% block mainbody %}
+
+    <style>
+        .rowDetailImage img {
+            width: 200px;
+        }
+    </style>
+
+    {#  显示数据表格  #}
+    <div class="layui-row layui-card">
+        <div class="layui-card">
+            <table id="dict_table" lay-filter="dictTable"/>
+        </div>
+        <div class="layui-card">
+            <table id="dict_detail_table" lay-filter="dictDetailTable"/>
+        </div>
+    </div>
+
+    <script type="text/html" id="mainTableToolBarDemo">
+        <div class="layui-btn-container">
+            <button type="button" id="addDictType" class="layui-btn layui-btn-sm layui-bg-blue"
+                    lay-event="addDictType" data-bs-toggle="modal" data-bs-target="#addDictTypeModal"
+                    onclick="dictTypeStyleChange('添加字典类型','添加')">
+                添加字典类型
+            </button>
+            <button type="button" id="addDictDetail" class="layui-btn layui-btn-sm layui-bg-blue"
+                    lay-event="addDictDetail" data-bs-toggle="modal" data-bs-target="#addDictDetailModal">
+                添加字典数据
+            </button>
+        </div>
+    </script>
+
+
+    <script type="text/html" id="mainTableRowTool">
+        <button id="detailDictData" class="layui-btn layui-btn-sm layui-bg-blue" lay-event="detail">查看详细</button>
+        <button id="editDictType" class="layui-btn layui-btn-sm layui-bg-orange" lay-event="update"
+                data-bs-toggle="modal" data-bs-target="#addDictTypeModal" onclick="dictTypeStyleChange('修改字典类型','修改')">
+            编辑
+        </button>
+        <button type="button" id="delVolInfo" class="layui-btn layui-btn-sm layui-bg-red" lay-event="deleteX">删除
+        </button>
+    </script>
+
+    <script type="text/html" id="secondTableRowTool">
+        <button id="editDictType" class="layui-btn layui-btn-sm layui-bg-orange" lay-event="detailUpdate"
+                data-bs-toggle="modal" data-bs-target="#addDictTypeModal"
+                onclick="dictTypeDetailStyleChange('修改字典值','修改值')">
+            编辑
+        </button>
+        <button type="button" id="delDetailInfo" class="layui-btn layui-btn-sm layui-bg-red" lay-event="deleteDetail">删除
+        </button>
+    </script>
+
+    {#  渲染数据表格以及操作  #}
+    <script type="text/javascript">
+        function dictTypeDetailStyleChange(titleText, btnText) {
+            $('#addDictTypeModalLabel').text(titleText)
+            $('#addDictTypeName').attr('placeholder', '请输入字典值')
+            $('.div-dict-desc').attr('style', 'display:none')
+            $('.controlDictTypeBtn').text(btnText)
+        }
+
+        function dictTypeStyleChange(titleText, btnText) {
+            $('#addDictTypeModalLabel').text(titleText)
+            $('#addDictTypeName').attr('placeholder', '请输入字典类型名称')
+            $('.div-dict-desc').style.attr('style', 'display:display')
+            $('.controlDictTypeBtn').text(btnText)
+        }
+
+        let data;
+        let mainTable = layui.table;
+        let secondaryTable = layui.table;
+        mainTable.render({
+            elem: '#dict_table',
+            url: '../dict?method=getAllDictType',
+            page: true,
+            text: '查询不到数据',
+            loading: true,
+            totalRow: true,
+            title: '数据字典类型信息',
+            types: 'checkbox',
+            toolbar: '#mainTableToolBarDemo',
+            cols: [[
+                {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
+                {field: 'dict_code', title: '字典编号', sort: true, fixed: 'left'},
+                {field: 'dict_type', title: '字典类型', sort: true, fixed: 'left'},
+                {field: 'dict_description', title: '描述信息', sort: true, fixed: 'left'},
+                {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
+            ]]
+        })
+    </script>
+
+    {#每行表格的后台操作#}
+    <script type="text/javascript">
+        function dictTypeEdit(dictCode) {
+            let dict_code = dictCode
+            console.log(dict_code)
+            $.ajax({
+                url: '../dict?method=getDictTypeByDictTypeCode&dict_code=' + dict_code,
+                method: 'GET',
+                success: function (datas) {
+                    $('#dictTypeCodeText').val(datas.data[0].dict_code)
+                    $('#addDictTypeName').val(datas.data[0].dict_type)
+                    $('#addDictDescription').val(datas.data[0].dict_description)
+                }
+            })
+        }
+
+        mainTable.on('tool(dictTable)', function (obj) {
+            let layEvent = obj.event;
+            let rowData = obj.data;
+            let id = rowData.dict_code;
+            switch (layEvent) {
+                case "detail":
+                    dictDetail(id)
+                    break;
+                case "update":
+                    console.log("update method.....")
+                    dictTypeEdit(id)
+                    break;
+                case "deleteX":
+                    dictDelete(id)
+                    break;
+            }
+        })
+
+        function detailUpdate(id, key, val) {
+            $('#dictTypeCodeText').val(id)
+            $('#dictDetailKey').val(key)
+            $('#addDictTypeName').val(val)
+        }
+
+        secondaryTable.on('tool(dictDetailTable)', function (obj) {
+            let layEvent = obj.event;
+            let rowData = obj.data;
+            let id = rowData.dict_code;
+            let info = rowData.dict_info;
+            let dictDetailKey = rowData.dict_detail_id;
+            switch (layEvent) {
+                case "deleteDetail":
+                    deleteDetail(id, info);
+                    break;
+                case "detailUpdate":
+
+                    detailUpdate(id, dictDetailKey, info);
+                    break;
+            }
+        })
+
+        function deleteDetail(id, detailVal) {
+            layer.confirm('你确定要删除吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
+                layer.close(index)
+                $.ajax({
+                    url: '../dict?method=delDictDetail&dict_code=' + id + '&dict_detail_name=' + detailVal,
+                    method: 'GET',
+                    success: function (datas) {
+                        layer.msg('删除成功', {time: 2000, anim: 5, icon: 1});
+                        mainTableReloadAllDatas(id);
+                    }
+                })
+            })
+
+        }
+    </script>
+
+    {#  查询代码  #}
+    <script type="text/javascript">
+
+        function mainTableReloadAllDatas(secondaryId = 0) {
+            mainTable.reload('dict_table', {
+                url: '../dict?method=getAllDictType',
+                page: {
+                    curr: 1
+                },
+                where: {}
+            }, true)
+            if (secondaryId != 0) {
+                dictDetail(secondaryId)
+            }
+
+        }
+    </script>
+
+    {#  头部工具栏函数  #}
+    <script type="text/javascript">
+        mainTable.on('toolbar(dictTable)', function (obj) {
+            let checkStatus = mainTable.checkStatus(obj.config.id);
+            let event = obj.event;
+            console.log(checkStatus);
+            console.log(event);
+
+            switch (event) {
+                case "addDictType":
+                    $('#addDictTypeName').val('')
+                    $('#addDictDescription').val('')
+                    break;
+                case "addDictDetail":
+                    $('#addDictDetailTypeName').children().remove()
+                    $.ajax({
+                        url: '../dict?method=getAllDictType',
+                        method: 'GET',
+                        success: function (datas) {
+                            let dictTypeVal = datas.data;
+                            dictTypeVal.forEach((item, index) => {
+                                $('#addDictDetailTypeName').append('<option value=' + item.dict_code + '>' + item.dict_type + '</option>')
+                            });
+                        }
+                    })
+                    break;
+            }
+        })
+
+        function addDictDetail() {
+            let optionVal = $('#addDictDetailTypeName').select().val()
+            let dictShowVal = $('#addDictDetailVal').val()
+            $.ajax({
+                url: '../dict/',
+                method: 'POST',
+                data: {
+                    "method": "addDictDataDetail",
+                    "dict_type_code": optionVal,
+                    "dict_val": dictShowVal
+                },
+                success: function (datas) {
+                    layer.msg('添加数据字典值成功', {time: 2000, anim: 5, icon: 1});
+                    $('#addDictDetailModal').modal('hide')
+                    mainTableReloadAllDatas(optionVal);
+                }
+            })
+        }
+    </script>
+
+    {#  每行工具栏操作函数  #}
+    <script type="text/javascript">
+        {#详细信息显示#}
+
+        function dictDetail(dictCode) {
+            secondaryTable.render({
+                elem: '#dict_detail_table',
+                url: '../dict?method=getDictDetailByDictTypeCode&dict_code=' + dictCode,
+                page: true,
+                text: '查询不到数据',
+                loading: true,
+                totalRow: true,
+                title: '数据字典详细信息',
+                types: 'checkbox',
+                cols: [[
+                    {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
+                    {field: 'dict_detail_id', title: '字典键', sort: true, fixed: 'left'},
+                    {field: 'dict_info', title: '字典值', sort: true, fixed: 'left'},
+                    {field: 'right', title: '操作', align: 'center', toolbar: '#secondTableRowTool'},
+                ]]
+            })
+        }
+
+        {#删除信息#}
+
+        function dictDelete(id) {
+            layer.confirm('你确定要删除吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
+                layer.close(index)
+                $.ajax({
+                    url: '../dict?method=delDictType&dict_code=' + id,
+                    method: "GET",
+                    success: function (datas) {
+                        layer.msg('删除成功', {time: 2000, anim: 5, icon: 1});
+                        mainTableReloadAllDatas();
+                    }
+                })
+            })
+        }
+
+        {#删除多条消息#}
+
+
+    </script>
+
+    {#  模态框操作  #}
+    <script type="text/javascript">
+        function addDictType() {
+            let dictTypeCode = $('#dictTypeCodeText').val()
+            console.log(dictTypeCode)
+            let dictTypeName = $('#addDictTypeName').val()
+            let dictDesc = $('#addDictDescription').val()
+            let val = $('.controlDictTypeBtn').text()
+            let key = $('#dictDetailKey').val()
+            if (val === '修改') {
+                $.ajax({
+                    url: '../dict/',
+                    method: 'POST',
+                    data: {
+                        "method": "editDictDataDetail",
+                        "dict_code": dictTypeCode,
+                        "dict_type_name": dictTypeName,
+                        "dict_description": dictDesc
+                    },
+                    dataType: "json",
+                    success: function (datas) {
+                        layer.msg('修改成功', {time: 2000, anim: 5, icon: 1});
+                        mainTableReloadAllDatas();
+                        $('#addDictTypeModal').modal('hide')
+                        $('#addDictTypeModalLabel').text('添加字典类型')
+                        $('.controlDictTypeBtn').text('添加')
+                    }
+                })
+            } else if (val === '修改值') {
+                $.ajax({
+                    url: '../dict/',
+                    method: 'POST',
+                    data: {
+                        "method": "editDictDetail",
+                        "dict_code": dictTypeCode,
+                        "dict_detail_key": key,
+                        "dict_detail_val": dictTypeName
+                    },
+                    success: function (datas) {
+                        layer.msg('修改成功', {time: 2000, anim: 5, icon: 1});
+                        mainTableReloadAllDatas(dictTypeCode);
+                        $('#addDictTypeModal').modal('hide')
+                    }
+                })
+            } else {
+                console.log("添加")
+                $.ajax({
+                    url: '../dict/',
+                    method: 'POST',
+                    data: {
+                        "method": "addDictType",
+                        "dict_type_name": dictTypeName,
+                        "dict_description": dictDesc
+                    },
+                    dataType: "json",
+                    success: function (datas) {
+                        layer.msg('添加成功', {time: 2000, anim: 5, icon: 1});
+                        mainTableReloadAllDatas();
+                        $('#addDictTypeModal').modal('hide')
+                    }
+                })
+            }
+
+        }
+    </script>
+{% endblock %}

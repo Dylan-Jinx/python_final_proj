@@ -7,4 +7,3 @@ def get_userTeamName() -> str:
     for i in range(8):
         e_userName = e_userName + (random.choice(usableName_char))
     return e_userName
-

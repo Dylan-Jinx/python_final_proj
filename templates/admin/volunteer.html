@@ -58,7 +58,7 @@
         </div>
         {#详细信息#}
         <div class="layui-panel" style="align-items: center;margin: 0 auto">
-            <table id="detailTable" lay-filter="volDetail" border="1">
+            <table id="detailTable" lay-filter="volDetail" border="1" class="table table-bordered">
                 <thead>
                 <tr>
                     <th class="detailTableLabel" colspan="20" align="center">志愿者详细信息表</th>
@@ -84,7 +84,6 @@
                     <td class="rowDetailImage" rowspan="4"><img alt="图片"
                                                                 src="{% static 'assert/images/default_icon.png' %}">
                     </td>
-                    <td class="rowDetailInfo">
                     </th>
                 </tr>
                 <tr>
@@ -118,9 +117,9 @@
             <button type="button" id="deleteMore" class="layui-btn layui-btn-sm layui-bg-red"
                     lay-event="moreDeleteX">批量删除
             </button>
-            <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue"
-                    lay-event="reserveSelected">反选
-            </button>
+{#            <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue"#}
+{#                    lay-event="reserveSelected">反选#}
+{#            </button>#}
         </div>
     </script>
 
@@ -158,11 +157,28 @@
                 {field: 'user_id', title: '用户id', sort: true, fixed: 'left', hide: true},
                 {field: 'nick_name', title: '昵称', sort: true, fixed: 'left', width: 120},
                 {field: 'user_name', title: '姓名', sort: true, fixed: 'left', width: 100},
-                {field: 'id_card', title: '身份证号', sort: true, fixed: 'left', width: 200},
-                {field: 'user_mail', title: '邮箱', sort: true, fixed: 'left', width: 240},
+                {field: 'id_card', title: '身份证号', sort: true, fixed: 'left', width: 180},
+                {field: 'user_mail', title: '邮箱', sort: true, fixed: 'left', width: 200},
                 {field: 'qq', title: 'QQ号', sort: true, fixed: 'left', width: 140},
                 {field: 'phone', title: '手机号码', sort: true, fixed: 'left', width: 140},
-                {#{field: 'hometown', title: '籍贯', sort: true, fixed: 'left', width: 140},#}
+                {
+                    field: 'hometown', title: '籍贯', sort: true, fixed: 'left', width: 180, templet: function (obj) {
+                        let hometown = obj.hometown;
+                        let result;
+                        $.ajax({
+                            url: '../regioncode?method=getAreaAllNameByCode&area_code=' + hometown,
+                            method: 'GET',
+                            async: false,
+                            dataType: "json"
+                        }).done(function (datas) {
+                            result = datas.result;
+                        })
+                        if(result == undefined){
+                            result = ''
+                        }
+                        return result;
+                    }
+                },
                 {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
             ]]
         })
@@ -263,6 +279,7 @@
                 cache: false,
                 dataType: "json",
                 success: function (datas) {
+                    console.log(datas)
                     let msg = datas.msg;
                     let data = datas.data[0];
                     console.log(data)
@@ -274,9 +291,9 @@
                     $('#user_mail').text(data.user_mail);
                     $('#qq').text(data.qq);
                     $('#wechat').text(data.wechat);
-                    $('#hometown').text(data.hometown);
+                    $('#hometown').text(datas.area_real_name);
                     $('#position').text(data.position);
-                    $('#service_area').text(data.service_area);
+                    $('#service_area').text(datas.service_real_name);
                     layer.msg(msg, {time: 2000, anim: 5, icon: 1});
                 },
             })

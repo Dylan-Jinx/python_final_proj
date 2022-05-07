@@ -4,11 +4,111 @@
 <head>
     <meta charset="UTF-8">
     <title>首页</title>
+
     <link rel="shortcut icon" href="{% static 'assert/images/favicon.ico' %}" type="image/x-icon">
     <script type="text/javascript" src="{% static 'assert/js/jquery-3.6.0.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
     <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}">
     <script type="text/javascript" src="{% static 'layui/layui.js' %}"></script>
 </head>
+<body>
+
+{#  模态框  #}
+{#  添加/修改数据字典类型模态框  #}
+<div class="modal fade" id="addDictTypeModal" tabindex="-1" aria-labelledby="addDictTypeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDictTypeModalLabel">添加字典类型</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="dictTypeCodeText">
+                    <input type="hidden" id="dictDetailKey">
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">字典类型:</label>
+                        <input type="text" id="addDictTypeName" class="form-control"
+                               placeholder="请输入字典类型名称">
+                    </div>
+                    <div class="mb-3 div-dict-desc">
+                        <label for="message-text" class="col-form-label">字典描述:</label>
+                        <input type="text" id="addDictDescription" class="form-control"
+                               placeholder="请输入字典描述"
+                               aria-describedby="addon-wrapping">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary controlDictTypeBtn" onclick="addDictType()">添加</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{# 添加数据字典类型中详细数据模态框 #}
+<div class="modal fade" id="addDictDetailModal" tabindex="-1" aria-labelledby="addDictDetailModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDictDetailModalLabel">添加字典详细信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="dictDetailCodeText">
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">字典类型:</label>
+                        <select class="form-select" id="addDictDetailTypeName">
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">字典显示值:</label>
+                        <input type="text" id="addDictDetailVal" class="form-control"
+                               placeholder="请输入字典显示的值"
+                               aria-describedby="addon-wrapping">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary controlDictDetailBtn" onclick="addDictDetail()">添加</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{# 队伍审核驳回模态框 #}
+<div class="modal fade" id="teamCheckModal" tabindex="-1" aria-labelledby="teamCheckModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="teamCheckModalLabel">驳回申请理由</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" id="applyFailId">
+          <div class="mb-3">
+              <div id="showTeamCheckFailInfo">
+              </div>
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">驳回理由:</label>
+            <textarea class="form-control" id="failTip" style="height: 200px"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="applyFail()">驳回</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header">
         <div class="layui-logo layui-hide-xs layui-bg-black">后台管理系统</div>
@@ -19,8 +119,8 @@
                 <i class="layui-icon layui-icon-spread-left"></i>
             </li>
 
-            <li class="layui-nav-item layui-hide-xs"><a href="">志愿者信息</a></li>
-            <li class="layui-nav-item layui-hide-xs"><a href="">志愿团体信息</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/volunteer">志愿者信息</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/team">志愿团体信息</a></li>
             <li class="layui-nav-item layui-hide-xs"><a href="">志愿项目信息</a></li>
         </ul>
         <ul class="layui-nav layui-layout-right">
@@ -58,7 +158,7 @@
                     <a href="javascript:;">志愿团体</a>
                     <dl class="layui-nav-child">
                         <dd><a href="/team">团体信息</a></dd>
-                        <dd><a href="javascript:;">团体审核</a></dd>
+                        <dd><a href="/teamcheck">团体审核</a></dd>
                         <dd><a href="javascript:;">团体评分</a></dd>
                     </dl>
                 </li>
@@ -70,19 +170,22 @@
                         <dd><a href="javascript:;">团体评分</a></dd>
                     </dl>
                 </li>
+                <li class="layui-nav-item"><a href="/dict">数据字典</a></li>
                 <li class="layui-nav-item"><a href="javascript:;">数据可视化</a></li>
             </ul>
         </div>
     </div>
 
     <div class="layui-body">
-        <div style="padding: 15px" ;>
+        <div style="padding: 15px">
             <!-- 内容主体区域 -->
             {% block mainbody %}
             {% endblock mainbody %}
         </div>
     </div>
 </div>
+
+
 <script src="./layui/layui.js"></script>
 <script>
     //JS

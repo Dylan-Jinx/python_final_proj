@@ -35,14 +35,50 @@
         }
     </style>
     <div class="layui-row layui-card">
-        <form class="layui-panel layui-form" action="">
+        <form class="layui-panel" action="" lay-filter="teamComplexQuery">
             <div class=" layui-form-item layui-row layui-col-space15">
                 <div class="layui-col-md1">
                     <label class="layui-form-label" style="padding: 9px 1px;">查询条件</label>
                 </div>
                 <div class="layui-col-md3">
-                    <input type="text" name="queryVolName" id="queryVolName" placeholder="请输入志愿者队伍名（支持模糊查询）"
+                    <input type="text" name="queryTeamName" id="queryTeamName" placeholder="请输入志愿队伍名"
                            autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-col-md-offset1  layui-col-md1">
+                    <label class="layui-form-label" style="padding: 9px 1px;">所在区域</label>
+                </div>
+                <div class="layui-col-md2">
+                    <select class="form-select" id="teamSearchProvince">
+                        <option value="0" disabled selected>请选择省</option>
+                        <option value="1" selected="selected">不限</option>
+                        {% for province in provinces %}
+                            <option value={{ province.code }}>{{ province.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="layui-col-md2" id="divSearchCity">
+                    <select class="form-select" id="teamSearchCity">
+                        <option value="0" disabled selected>请选择市</option>
+                        <option value="1" selected="selected">不限</option>
+                    </select>
+                </div>
+                <div class="layui-col-md2" id="divSearchArea">
+                    <select class="form-select" id="teamSearchArea">
+                        <option value="0" disabled selected>请选择县</option>
+                        <option value="1" selected="selected">不限</option>
+                    </select>
+                </div>
+                <div class="layui-col-md1">
+                    <label class="layui-form-label" style="padding: 9px 1px;">时间区间</label>
+                </div>
+                <div class="layui-col-md2">
+                    <input id="startTimeInput" type="date" class="layui-input">
+                </div>
+                <div class="layui-col-md1">
+                    <label class="layui-form-label" style="font-size: 20px">~</label>
+                </div>
+                <div class="layui-col-md2">
+                    <input id="endTimeInput" type="date" class="layui-input">
                 </div>
                 <div class="layui-col-md2">
                     <button id="queryBtn" type="button" class="layui-btn layui-bg-blue"
@@ -54,7 +90,7 @@
             </div>
         </form>
         <div class="layui-card">
-            <table id="voluteer_table" lay-filter="volunteer"/>
+            <table id="voluteer_team_table" lay-filter="volunteerTeam"/>
         </div>
     </div>
 
@@ -63,20 +99,14 @@
             <button type="button" id="deleteMore" class="layui-btn layui-btn-sm layui-bg-red"
                     lay-event="moreDeleteX">批量删除
             </button>
-            <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue"
-                    lay-event="reserveSelected">反选
-            </button>
+{#            <button type="button" id="reserveSelected" class="layui-btn layui-btn-sm layui-bg-blue"#}
+{#                    lay-event="reserveSelected">反选#}
+{#            </button>#}
         </div>
     </script>
 
 
     <script type="text/html" id="mainTableRowTool">
-        <button id="detailTeam" class="layui-btn layui-btn-sm layui-bg-blue" lay-event="detail"
-                data-bs-toggle="modal" data-bs-target="#empInfoModal">查看详细
-        </button>
-        <button id="editTeam" class="layui-btn layui-btn-sm layui-bg-orange" lay-event="update"
-                data-bs-toggle="modal" data-bs-target="#teamModal">编辑
-        </button>
         <button id="resetPwd" class="layui-btn layui-btn-sm layui-bg-cyan" lay-event="resetPwd"
                 data-bs-toggle="modal" data-bs-target="#empInfoModal">重置密码
         </button>
@@ -89,7 +119,7 @@
         let data;
         let mainTable = layui.table;
         mainTable.render({
-            elem: '#voluteer_table',
+            elem: '#voluteer_team_table',
             url: '../team?method=getAllInfo&remove_flag=0',
             page: true,
             text: '查询不到数据',
@@ -101,13 +131,53 @@
             cols: [[
                 {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
                 {field: 'team_id', title: '队伍id', sort: true, fixed: 'left', hide: true},
-                {field: 'team_name', title: '志愿队伍名称', sort: true, fixed: 'left', width: 120},
+                {field: 'team_name', title: '志愿队伍名称', sort: true, fixed: 'left', width: 160},
                 {field: 'team_concact', title: '联系人', sort: true, fixed: 'left', width: 100},
-                {field: 'team_concact_phone', title: '联系电话', sort: true, fixed: 'left', width: 200},
+                {field: 'team_concact_phone', title: '联系电话', sort: true, fixed: 'left', width: 140},
                 {field: 'team_intro', title: '介绍', sort: true, fixed: 'left', width: 240},
-                {field: 'team_area', title: '所属区域', sort: true, fixed: 'left', width: 140},
-                {field: 'team_create_time', title: '创建时间', sort: true, fixed: 'left', width: 180},
-                {#{field: 'hometown', title: '籍贯', sort: true, fixed: 'left', width: 140},#}
+                {
+                    field: 'team_area', title: '所属区域', sort: true, fixed: 'left', width: 180, templet: function (obj) {
+                        let teamArea = obj.team_area;
+                        let result;
+                        $.ajax({
+                            url: '../regioncode?method=getAreaAllNameByCode&area_code=' + teamArea,
+                            method: 'GET',
+                            async: false,
+                            dataType: "json"
+                        }).done(function (datas) {
+                            result = datas.result;
+                        })
+                        if (result == undefined) {
+                            result = "";
+                        }
+                        return result;
+                    }
+                },
+                {
+                    field: 'team_create_time',
+                    title: '创建时间',
+                    sort: true,
+                    fixed: 'left',
+                    width: 150,
+                    templet: function (obj) {
+                        let createTime = obj.team_create_time;
+                        let result;
+                        let time = new Date(createTime)
+                        let year = time.getFullYear();
+                        let month = time.getMonth() + 1;
+                        let day = time.getDate();
+                        let hours = time.getHours();
+                        let min = time.getMinutes();
+                        let seconds = time.getSeconds();
+                        if (month < 10) month = '0' + month;
+                        if (day < 10) day = '0' + day;
+                        if (hours < 0) hours = '0' + hours;
+                        if (min < 10) min = '0' + min;
+                        if (seconds < 10) seconds = '0' + seconds;
+                        result = year + '-' + month + '-' + day;
+                        return result
+                    }
+                },
                 {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
             ]]
         })
@@ -115,7 +185,7 @@
 
     {#每行表格的后台操作#}
     <script type="text/javascript">
-        mainTable.on('tool(volunteer)', function (obj) {
+        mainTable.on('tool(volunteerTeam)', function (obj) {
             let layEvent = obj.event;
             let rowData = obj.data;
             let id = rowData.team_id;
@@ -147,15 +217,36 @@
             var DISABLED = 'layui-btn-disabled';
             $('#queryVolName').addClass(DISABLED);
             $('#queryVolName').attr('disabled', 'disabled');
-            let queryVolName = $('#queryVolName').val();
-            console.log(queryVolName);
-            mainTable.reload('voluteer_table', {
-                url: '../volunteer?method=searchVolunteer',
+            let provinceSelected = $('#teamSearchProvince').val();
+            let citySelected = $('#teamSearchCity').val();
+            let areaSelected = $('#teamSearchArea').val();
+            console.log(provinceSelected, citySelected, areaSelected);
+            let policyCode = null;
+            if (!(provinceSelected == 1)) {
+                policyCode = provinceSelected.substr(0,2);
+            }
+            if (!(citySelected == 1)) {
+                policyCode = citySelected.substr(0,4);
+            }
+            if (!(areaSelected == 1)) {
+                policyCode = areaSelected;
+            }
+            console.log(policyCode);
+
+            let queryTeamName = $('#queryTeamName').val();
+            let startTime = $('#startTimeInput').val();
+            let endTime = $('#endTimeInput').val();
+            console.log(queryTeamName, startTime, endTime);
+            mainTable.reload('voluteer_team_table', {
+                url: '../team?method=searchVolunteerTeamWithComplexQuery',
                 page: {
                     curr: 1
                 },
                 where: {
-                    queryVolName: queryVolName
+                    area_code: policyCode,
+                    team_name: queryTeamName,
+                    start_time: startTime,
+                    end_time: endTime,
                 }
             }, true)
             $('#queryVolName').removeClass(DISABLED);
@@ -165,7 +256,7 @@
         }
 
         function mainTableReloadAllDatas() {
-            mainTable.reload('voluteer_table', {
+            mainTable.reload('voluteer_team_table', {
                 url: '../team?method=getAllInfo&remove_flag=0',
                 page: {
                     curr: 1
@@ -179,7 +270,7 @@
 
     {#  头部工具栏函数  #}
     <script type="text/javascript">
-        mainTable.on('toolbar(volunteer)', function (obj) {
+        mainTable.on('toolbar(volunteerTeam)', function (obj) {
             let checkStatus = mainTable.checkStatus(obj.config.id);
             let event = obj.event;
             console.log(checkStatus);
@@ -200,6 +291,7 @@
     {#  每行工具栏操作函数  #}
     <script type="text/javascript">
         {#详细信息显示#}
+
         function volDetail(teamId) {
             $.ajax({
                 url: '../team?method=getVolunteerTeamDetailByTeamId&team_id=' + teamId,
@@ -232,7 +324,7 @@
             layer.confirm('你确定要删除吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
                 layer.close(index)
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/team?method=deleteById&team_id=' + id,
+                    url: '../team?method=deleteById&team_id=' + id,
                     method: "DELETE",
                     contentType: 'application/json',
                     dataType: "json",
@@ -249,11 +341,11 @@
             layer.confirm('确定要重置该团体账号的密码吗？', {icon: 3, btn: ['确定', '取消']}, function (index) {
                 layer.close(index)
                 $.ajax({
-                    url: '../team?method=resetPwd&id='+id,
+                    url: '../team?method=resetPwd&id=' + id,
                     method: "GET",
                     success: function (datas) {
                         layer.msg(datas.msg, {time: 2000, anim: 5, icon: 1});
-                        mainTableReloadAllDatas();
+                        {#mainTableReloadAllDatas();#}
                     }
                 })
             })
@@ -285,6 +377,45 @@
                 })
             })
         }
+    </script>
+
+    {#  控件改变交互逻辑  #}
+    <script type="text/javascript">
+        $('#teamSearchProvince').change(function (obj) {
+            console.log('value of selected has changed')
+            let provinceCode = $('#teamSearchProvince').val();
+            $.ajax({
+                url: '../regioncode?method=getCitiesByProvinceCode&province_code=' + provinceCode,
+                method: 'GET',
+                success: function (data) {
+                    $('#teamSearchCity').children().remove()
+                    let cityPlaceholder = "<option value='0' disabled selected>请选择市</option>";
+                    let cityNotLimit = "<option value='1' selected>不限</option>";
+                    $('#teamSearchCity').append(cityPlaceholder).append(cityNotLimit)
+                    data.data.forEach((item, index) => {
+                        $('#teamSearchCity').append("<option value=" + item.code + " selected>" + item.name + "</option>")
+                    })
+                }
+            })
+        })
+
+        $('#teamSearchCity').change(function (obj) {
+            console.log('value of selected has changed')
+            let cityCode = $('#teamSearchCity').val();
+            $.ajax({
+                url: '../regioncode?method=getAreasByCityCode&city_code=' + cityCode,
+                method: 'GET',
+                success: function (data) {
+                    $('#teamSearchArea').children().remove()
+                    let areaPlaceholder = "<option value='0' disabled selected>请选择县</option>";
+                    let areaNotLimit = "<option value='1' selected>不限</option>";
+                    $('#teamSearchArea').append(areaPlaceholder).append(areaNotLimit)
+                    data.data.forEach((item, index) => {
+                        $('#teamSearchArea').append("<option value=" + item.code + " selected>" + item.name + "</option>")
+                    })
+                }
+            })
+        })
     </script>
 
 {% endblock %}

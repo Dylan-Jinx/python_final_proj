@@ -1,0 +1,181 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% block mainbody %}
+
+
+    <div class="layui-card">
+        <table id="volunteer_team_check_table" lay-filter="volunteerTeamCheck"></table>
+    </div>
+
+    <script type="text/html" id="mainTableRowTool">
+        <div class="layui-btn-container">
+            <button type="button" id="applySuccess" class="layui-btn layui-btn-sm layui-bg-blue"
+                    lay-event="applySuccess">通过申请
+            </button>
+            <button type="button" id="appplyFail" class="layui-btn layui-btn-sm layui-bg-red"
+                    lay-event="appplyFail" data-bs-toggle="modal" data-bs-target="#teamCheckModal">驳回申请
+            </button>
+        </div>
+    </script>
+
+    {#  渲染数据表格以及操作  #}
+    <script type="text/javascript">
+        let data;
+        let mainTable = layui.table;
+        mainTable.render({
+            elem: '#volunteer_team_check_table',
+            url: '../teamcheck?method=getAllInfo',
+            page: true,
+            text: '查询不到数据',
+            loading: true,
+            totalRow: true,
+            title: '志愿者信息',
+            types: 'checkbox',
+            toolbar: '#mainTableToolBarDemo',
+            cols: [[
+                {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
+                {field: 'team_id', title: '队伍id', sort: true, fixed: 'left', hide: true},
+                {field: 'team_name', title: '志愿队伍名称', sort: true, fixed: 'left', width: 160},
+                {field: 'team_concact', title: '联系人', sort: true, fixed: 'left', width: 100},
+                {field: 'team_concact_phone', title: '联系电话', sort: true, fixed: 'left', width: 140},
+                {field: 'team_intro', title: '介绍', sort: true, fixed: 'left', width: 240},
+                {
+                    field: 'team_area', title: '所属区域', sort: true, fixed: 'left', width: 180, templet: function (obj) {
+                        return convertAreaCodeToAreaName(obj.team_area)
+                    }
+                },
+                {
+                    field: 'team_create_time',
+                    title: '申请日期',
+                    sort: true,
+                    fixed: 'left',
+                    width: 150,
+                    templet: function (obj) {
+                        return convertTimeWithTType(obj.team_create_time)
+                    }
+                },
+                {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
+            ]]
+        })
+    </script>
+
+    {# 每行工具栏的操作 #}
+    <script type="text/javascript">
+        function mainTableReloadAllDatas() {
+            mainTable.reload('volunteer_team_check_table', {
+                url: '../teamcheck?method=getAllInfo',
+                page: {
+                    curr: 1
+                },
+                where: {}
+            }, true)
+        }
+
+        function applySuccess(id, rowData) {
+            let result = '';
+            $.ajax({
+                url: '../regioncode?method=getAreaAllNameByCode&area_code=' + rowData.team_area,
+                method: 'GET',
+                async: false,
+                dataType: "json"
+            }).done(function (datas) {
+                result = datas.result;
+            })
+            if (result == undefined) {
+                result = "";
+            }
+            teamInfo = '队伍名:' + rowData.team_name + '<br>' + '队伍联系人:' + rowData.team_concact + '<br>联系电话:' + rowData.team_concact_phone + '<br>队伍所属区域：' + result;
+            layer.confirm('你将要通过志愿队伍信息如下<br>' + teamInfo, {icon: 3, btn: ['确定', '取消']}, function (index) {
+                layer.close(index)
+                $.ajax({
+                    url: '../teamcheck?method=applySuccess&team_id=' + id,
+                    method: "GET",
+                    success: function (datas) {
+                        layer.msg('操作成功', {time: 2000, anim: 5, icon: 1});
+                        mainTableReloadAllDatas();
+                    }
+                })
+            })
+        }
+
+        function convertAreaCodeToAreaName(areaCode) {
+            let result;
+            $.ajax({
+                url: '../regioncode?method=getAreaAllNameByCode&area_code=' + areaCode,
+                method: 'GET',
+                async: false,
+                dataType: "json"
+            }).done(function (datas) {
+                result = datas.result;
+            })
+            if (result == undefined) {
+                result = "";
+            }
+            return result;
+        }
+
+        function convertTimeWithTType(datetime) {
+            let time = new Date(datetime)
+            let year = time.getFullYear();
+            let month = time.getMonth() + 1;
+            let day = time.getDate();
+            let hours = time.getHours();
+            let min = time.getMinutes();
+            let seconds = time.getSeconds();
+            if (month < 10) month = '0' + month;
+            if (day < 10) day = '0' + day;
+            if (hours < 0) hours = '0' + hours;
+            if (min < 10) min = '0' + min;
+            if (seconds < 10) seconds = '0' + seconds;
+            convertTime = year + '-' + month + '-' + day;
+            return convertTime;
+        }
+
+        function applyFailModalShow(rowData) {
+            $('#applyFailId').val(rowData.team_id)
+            convertTimeWithoutT = rowData.team_create_time.replace('T', ' ');
+            $('#showTeamCheckFailInfo').children().remove();
+            info = `<p class="lh-lg fs-5" style="font-weight: bold;color: red;">您将要驳回申请的队伍信息如下（请仔细确认后再进行操作)<br>队伍名为： ${rowData.team_name}<br>队伍联系人为：${rowData.team_concact}
+                    <br>联系方式为：${rowData.team_concact_phone}<br>所属区域为：${convertAreaCodeToAreaName(rowData.team_area)}<br>该队伍申请提交时间为：${convertTimeWithoutT}</p>`;
+            $('#showTeamCheckFailInfo').append(info);
+        }
+
+        function applyFail() {
+            let teamId = $('#applyFailId').val()
+            let tip = $('#failTip').val()
+            console.log(teamId, tip)
+            $.ajax({
+                url: '../teamcheck/',
+                method: 'POST',
+                data: {
+                    "method": "applyFailed",
+                    "mark_tip": tip,
+                    "team_id": teamId,
+                },
+                dataType: 'json',
+                success: function (datas) {
+                    layer.msg('驳回志愿队伍请求成功', {time: 2000, anim: 5, icon: 1});
+                    mainTableReloadAllDatas();
+                    $('#teamCheckModal').modal('hide');
+                }
+            })
+        }
+
+        mainTable.on('tool(volunteerTeamCheck)', function (obj) {
+            let layEvent = obj.event;
+            let rowData = obj.data;
+            let id = rowData.team_id;
+            console.log(layEvent);
+            console.log(rowData);
+            console.log(id);
+            switch (layEvent) {
+                case "applySuccess":
+                    applySuccess(id, rowData);
+                    break;
+                case "appplyFail":
+                    applyFailModalShow(rowData);
+                    break;
+            }
+        })
+    </script>
+{% endblock %}

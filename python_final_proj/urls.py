@@ -24,9 +24,12 @@ urlpatterns = [
     path('admin/index/', admin.IndexView.as_view()),
     path('admin/login/', admin.LoginView.as_view()),
     path('admin/logout/', admin.LogOutView.as_view()),
+
     path('volunteer/', admin.VolunteerView.as_view()),
     path('team/', admin.VolunteerTeamView.as_view()),
+    path('teamcheck/', admin.VolunteerTeamCheckView.as_view()),
     path('regioncode/', admin.ThreeLevelProvinceAndCityAndAreaLinker.as_view()),
+    path('dict/', admin.DataDict.as_view()),
 
 
     path('index/', web.AppIndex.as_view()),
