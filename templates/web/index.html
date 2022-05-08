@@ -9,39 +9,199 @@
     <script type="text/javascript" src="{% static 'assert/js/jquery-3.6.0.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
     <style>
-        #autoRoundGraph {
 
+        .index-logo {
+            max-width: 60%;
+            height: auto;
+            width: 100%;
         }
+
+        #login-box {
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        .header_banner img {
+            width: 100%;
+        }
+
+        #loginBtn {
+            border: 0;
+            color: #333333;
+            margin: 0px 10px 0px 15px;
+            font-size: 14px;
+            background-color: rgb(224, 210, 192);
+        }
+
+        .address {
+            margin-top: 20px;
+        }
+
+
+        #loginBtn:hover {
+            color: #DB3545;
+            transition: all .3s ease;
+            background-color: #F0F0F0;
+            -webkit-box-shadow: 10px 10px 99px 6px #DB3545;
+            -moz-box-shadow: 10px 10px 99px 6px #DB3545;
+            box-shadow: 10px 10px 99px 6px #DB3545;
+        }
+
+        .mid-body-right-title {
+            text-align: left;
+        }
+
+        .mid-body-right-news ul li {
+            line-height: 1.5;
+            padding: 13px;
+            width: 100%;
+            display: inline-flex;
+        }
+
+        .mid-body-right-news ul li::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #cc0000;
+            margin-top: 10px;
+            border-radius: 50%;
+            margin-left: -40px;
+        }
+
+        .mid-body-right-news ul li a {
+            color: #333;
+            font-size: 16px;
+            margin-left: 40px;
+            transition: all .3s ease;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 80%;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .mid-body-right-news ul li span {
+            color: #999;
+            font-size: 16px;
+            margin-left: 40px;
+            width: 20%;
+            text-align: right;
+            display: inline-block;
+        }
+
     </style>
-    <script>
-        let turnVal = 0.0;
-        let horizonMoveVal = 0.0;
-        let step = 5
-
-        function start(n) {
-            console.log('233')
-            $("#start").val(n);
-            var ref = setInterval(function () {
-                var start = Number($("#start").val());
-                turnVal = turnVal + 0.01;
-                horizonMoveVal = horizonMoveVal + step;
-                $('#autoRoundGraph').attr('style','width: auto; height: 30rem; transform: rotate('+turnVal+'turn)')
-                console.log(turnVal);
-                if (start == 0) {
-                    clearInterval(ref);
-                }
-            }, 10);
-        }
-
-
-    </script>
 </head>
 
 <body>
-<img alt="test" style="width: auto; height: 30rem; transform: rotate(0.0turn) translateX(10px)" src="{% static '/firefox-logo.svg' %}"
-     id="autoRoundGraph"/>
-<button class="start" onclick="start(1)">开始</button>
-<button class="timeout" onclick="start(0)">暂停</button>
-
+<div id="app">
+    <div id="index_page1">
+        <div id="header" class="row container"
+             style="margin-left: auto;margin-right: auto;position: absolute;margin-left: 180px;">
+            <div class="col-md" style="text-align: left;margin-top: 20px;">
+                <p>
+                    <img class="index-logo" src="{% static 'assert/images/index_logo.png' %}">
+                </p>
+            </div>
+            <div class="col-md" style="text-align: right;margin-top: 20px;margin-left: 40px;">
+                <div id="login-box">
+                    <dl class="address">
+                        <button type="button" id="loginBtn" class=" btn btn-xs btn-light">登录</button>
+                        <button type="button" id="loginBtn" class=" btn btn-xs btn-light">志愿者注册</button>
+                        <button type="button" id="loginBtn" class=" btn btn-xs btn-light">志愿队伍注册</button>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="header_banner">
+            <img src="{% static 'assert/images/index_header.png' %}" alt="">
+        </div>
+        <div class="mid-body">
+            <div class="row"
+                 style="position: absolute;margin-left: auto;margin-right: auto;">
+                <div class="col offset-1">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel"
+                         style="width: 610px">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0"
+                                    class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                                    aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                                    aria-label="Slide 3"></button>
+                        </div>
+                        <div class="carousel-inner" style="border-radius: 5%;margin-top: 20px">
+                            <div class="carousel-item active">
+                                <img src="{% static 'assert/images/index_show1.webp' %}" class="d-block w-100 figure"
+                                     alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'assert/images/index_show2.webp' %}" class="d-block w-100"
+                                     alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{% static 'assert/images/index_show1.webp' %}" class="d-block w-100"
+                                     alt="...">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                                data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                                data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="col" style="margin-top: 30px;">
+                    <div class="mid-body-right-title">
+                        <img style="float: left" src="{% static 'assert/images/new_icon.png' %}" alt="">
+                        <div class="fw-bolder" style="margin-left: 40px;line-height: 40px">信息动态</div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="mid-body-right-news">
+                        <ul>
+                            <li>
+                                <a>江苏徐州：关于进一步加强疫情防控志愿服务工作的通知</a>
+                                <span>2022-03-30</span>
+                            </li>
+                            <li>
+                                <a>黑龙江：民政厅印发关于进一步发挥慈善力量社会工作者志愿服务作</a>
+                                <span>2022-03-28</span>
+                            </li>
+                            <li>
+                                <a>广东：民政厅印发关于发挥“五社联动”作用助力基层疫情防控工作</a>
+                                <span>2022-03-28</span>
+                            </li>
+                            <li>
+                                <a>吉林：中宣部、中央文明办在吉林省开展的“志愿服务关爱行动”报</a>
+                                <span>2022-03-27</span>
+                            </li>
+                            <li>
+                                <a>上海：为抗疫志愿者免费提供最高赔付50万元的特定保险</a>
+                                <span>2022-03-21</span>
+                            </li>
+                            <li>
+                                <a>河南郑州： 创新机制 加快推进志愿服务工作发展</a>
+                                <span>2022-03-07</span>
+                            </li>
+                            <li>
+                                <a>天津和平区： 努力打造志愿服务新高地</a>
+                                <span>2022-03-07</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mid-banner">
+            <img style="width: 100%" src="{% static 'assert/images/index_middle.png' %}" alt="">
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>志愿者注册登记预约分配系统</title>
+    <link rel="shortcut icon" href="{% static 'assert/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <script type="text/javascript" src="{% static 'assert/js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+    <style>
+        * {
+            list-style: none;
+        }
+
+        div {
+            width: 100%;
+            height: 1000px;
+            background: skyblue;
+        }
+
+        div:nth-child(2) {
+            background: lightpink;
+        }
+
+        div:nth-child(3) {
+            background: lightgreen;
+        }
+
+        div:nth-child(4) {
+            background: lightcoral;
+        }
+
+        ul {
+            position: fixed;
+            right: 30px;
+            width: 200px;
+            height: 200px;
+            margin: auto;
+            top: 0;
+            bottom: 0;
+            {#border: 1px solid blue;#}
+            padding: 0;
+        }
+
+        li {
+            width: 100%;
+            height: 25%;
+            line-height: 25px;
+            border-radius: 50%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        li.active {
+            color: #579CFF;
+            {#background-color: #F0F0F0;#}
+            font-weight: bold;
+            font-size: 18px;
+            transition: all .3s ease;
+        }
+        .indic{
+            width: 20px;
+            height: 20px;
+            background-color: #F0F0F0;
+            display: block;
+            float: left;
+            position: absolute;
+            left: 30px;
+            margin-top: -25px;
+            border-radius: 50%;
+            box-shadow: 5px 3px 2px #FF3BA1;
+            transition: all .3s ease;
+            transform:rotate(90grad);
+            animation: fadenum 5s infinite;
+        }
+        ul li span{
+            width: 120px;
+            height: 120px;
+        }
+
+        ul li span:hover{
+            animation: fadenum 5s infinite;
+        }
+
+        @keyframes fadenum {
+            100%{transform: rotate(360deg);}
+            0%{transform: rotate(0deg);}
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(window).scroll(function (obj) {
+
+            {#console.log(obj)#}
+            let scrollTop = $(window).scrollTop();
+            console.log(scrollTop)
+            if (scrollTop <= 800) {
+                $('ul li').children().removeClass('indic')
+                $('ul li').removeClass('active')
+                $('ul li').eq(0).addClass('active')
+                $('ul li').eq(0).children('span').addClass('indic')
+                console.log("0 elements")
+            } else if (scrollTop >= 800 && scrollTop <= 1600) {
+                $('ul li').children().removeClass('indic')
+                $('ul li').removeClass('active')
+                $('ul li').eq(1).addClass('active')
+                $('ul li').eq(1).children('span').addClass('indic')
+            } else if (scrollTop >= 1600 && scrollTop <= 2400) {
+                $('ul li').children().removeClass('indic')
+                $('ul li').removeClass('active')
+                $('ul li').eq(2).addClass('active')
+                $('ul li').eq(2).children('span').addClass('indic')
+            } else if (scrollTop >= 2400) {
+                $('ul li').children().removeClass('indic')
+                $('ul li').removeClass('active')
+                $('ul li').eq(3).addClass('active')
+                $('ul li').eq(3).children('span').addClass('indic')
+            }
+        })
+    </script>
+
+</head>
+
+<body>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <ul>
+        <li class="active">重点标记1<span class="indic"></span></li>
+        <li>重点标记2<span></span></li>
+        <li>重点标记3<span></span></li>
+        <li>重点标记4<span></span></li>
+    </ul>
+</body>
+</html>
