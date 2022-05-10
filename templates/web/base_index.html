@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>志愿者注册登记预约分配系统</title>
+    <link rel="shortcut icon" href="{% static 'assert/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <script type="text/javascript" src="{% static 'assert/js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+    <style>
+        .index-logo {
+            max-width: 60%;
+            height: auto;
+            width: 100%;
+        }
+
+        #login-box {
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        .header_banner img {
+            width: 100%;
+        }
+
+        #loginBtn {
+            border: 0;
+            color: #333333;
+            margin: 0px 10px 0px 15px;
+            font-size: 14px;
+            background-color: rgb(224, 210, 192);
+        }
+
+        .address {
+            margin-top: 20px;
+        }
+
+
+        #loginBtn:hover {
+            color: #F0F0F0;
+            background-color: #DB3545;
+            transition: all .3s ease;
+            -webkit-box-shadow: transparent;
+            -moz-box-shadow: transparent;
+            box-shadow: transparent;
+        }
+
+        #loginBtn:active {
+            color: #DB3545;
+            transition: all .3s ease;
+            background-color: #F0F0F0;
+            -webkit-box-shadow: 10px 10px 99px 6px #DB3545;
+            -moz-box-shadow: 10px 10px 99px 6px #DB3545;
+            box-shadow: 10px 10px 99px 6px #DB3545;
+        }
+
+        #navbar nav {
+            width: 100%;
+            position: absolute;
+            top: 15%;
+            background-color: #DB3545 !important;
+        }
+
+        #navbar nav div div a {
+            color: #F0F0F0;
+            font-size: 22px;
+            padding: 15px;
+            margin-left: 50px;
+            font-weight: 600;
+            transition: all .3s ease-in-out;
+        }
+
+        #navbar nav div div a:hover {
+            color: #DB3545;
+            background-color: #F0F0F0;
+        }
+
+        #breadCrumbNav{
+            position: absolute;
+            top: 25%;
+            left: 12%;
+        }
+
+        #breadCrumbNav li a{
+            text-decoration: none;
+        }
+
+        #noactive a{
+            color: #DB3543;
+        }
+    </style>
+</head>
+<body>
+<div id="userApp">
+    <div id="header" class="row container"
+         style="margin-left: auto;margin-right: auto;position: absolute;margin-left: 180px;">
+        <div class="col-md" style="text-align: left;margin-top: 20px;">
+            <p>
+                <img class="index-logo" src="{% static 'assert/images/index_logo.png' %}">
+            </p>
+        </div>
+        <div class="col-md" style="text-align: right;margin-top: 20px;margin-left: 40px;">
+            <div id="login-box">
+                <dl class="address">
+                    <a href="../index?method=registerRegPage" type="button" id="loginBtn" class=" btn btn-xs btn-light">志愿者注册</a>
+                    <a href="../index?method=registerRegTeamPage" type="button" id="loginBtn"
+                       class=" btn btn-xs btn-light">志愿队伍注册</a>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="header_banner">
+        <img src="{% static  'assert/images/base_index_banner.png' %}" alt="">
+    </div>
+    <div id="navbar">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light" style="position: absolute">
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav text-center" style="margin:0 auto">
+                    <a class="nav-link active" aria-current="page" href="#">首页</a>
+                    <a class="nav-link" href="../../area/">志愿项目</a>
+                    <a class="nav-link" href="../../user/team?method=allWithPage&page=1&limit=16">志愿队伍</a>
+                    <a class="nav-link">动态</a>
+                    <a class="nav-link">探索</a>
+                    <a class="nav-link">项目</a>
+                    <a class="nav-link">故事</a>
+                    <a class="nav-link">队伍</a>
+                    <a class="nav-link">专题</a>
+                    <a class="nav-link">资料</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <nav aria-label="breadcrumb" id="breadCrumbNav">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" id="noactive"><a href="../../">首页</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ breadNav }}</li>
+        </ol>
+    </nav>
+    <div id="content">
+        {% block userBody %}
+        {% endblock userBody %}
+    </div>
+    <div id="footer" class="card-footer"></div>
+</div>
+</body>
+</html>

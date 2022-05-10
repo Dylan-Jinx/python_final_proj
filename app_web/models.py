@@ -77,29 +77,26 @@ class TeamProject(models.Model):
 
 
 class Volunteer(models.Model):
-    user_id = models.CharField(max_length=255, blank=True, null=True)
-    nick_name = models.CharField(max_length=255, blank=True, null=True)
-    user_name = models.CharField(max_length=255, blank=True, null=True)
-    id_card = models.CharField(max_length=255, blank=True, null=True)
-    pwd = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.CharField(max_length=255, blank=True, null=True)
-    user_mail = models.CharField(max_length=255, blank=True, null=True)
-    qq = models.CharField(max_length=255, blank=True, null=True)
-    wechat = models.CharField(max_length=255, blank=True, null=True)
-    hometown = models.CharField(max_length=255, blank=True, null=True)
-    education = models.CharField(max_length=255, blank=True, null=True)
-    position = models.CharField(max_length=255, blank=True, null=True)
-    service_area = models.CharField(max_length=255, blank=True, null=True)
-    user_icon = models.TextField(blank=True, null=True)
-    remove_flag = models.CharField(max_length=255, blank=True, null=True)
+    user_id = models.CharField(max_length=255, blank=True, null=True, verbose_name='用户id')
+    nick_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='昵称')
+    user_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='身份证号')
+    id_card = models.CharField(max_length=255, blank=True, null=True, verbose_name='密码')
+    pwd = models.CharField(max_length=255, blank=True, null=True, verbose_name='密码')
+    phone = models.CharField(max_length=255, blank=True, null=True, verbose_name='联系电话')
+    user_mail = models.CharField(max_length=255, blank=True, null=True, verbose_name='邮箱')
+    qq = models.CharField(max_length=255, blank=True, null=True, verbose_name='QQ号')
+    wechat = models.CharField(max_length=255, blank=True, null=True, verbose_name='微信号')
+    hometown = models.CharField(max_length=255, blank=True, null=True, verbose_name='籍贯')
+    education = models.CharField(max_length=255, blank=True, null=True, verbose_name='教育背景')
+    position = models.CharField(max_length=255, blank=True, null=True, verbose_name='职业')
+    service_area = models.CharField(max_length=255, blank=True, null=True, verbose_name='服务区域')
+    user_icon = models.TextField(blank=True, null=True, verbose_name='用户头像')
+    remove_flag = models.CharField(max_length=255, blank=True, null=True, verbose_name='删除标志')
 
     class Meta:
         managed = False
         db_table = 'volunteer'
         verbose_name = verbose_name_plural = '志愿者信息'
-
-    def VolunteerReflect(obj):
-        return namedtuple(obj.keys())(*obj.values())
 
 
 class VolunteerComment(models.Model):
@@ -145,6 +142,7 @@ class VolunteerRank(models.Model):
 
 class VolunteerTeam(models.Model):
     team_id = models.CharField(max_length=255, blank=True, null=True)
+    team_name = models.CharField(max_length=255, blank=True, null=True)
     team_login_name = models.CharField(max_length=255, blank=True, null=True)
     team_pwd = models.CharField(max_length=255, blank=True, null=True)
     team_concact = models.CharField(max_length=255, blank=True, null=True)
@@ -153,7 +151,38 @@ class VolunteerTeam(models.Model):
     team_intro = models.TextField(blank=True, null=True)
     team_create_time = models.DateTimeField(blank=True, null=True)
     remove_flag = models.CharField(max_length=255, blank=True, null=True)
+    team_area = models.CharField(max_length=255, blank=True, null=True)
+    remark = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'volunteer_team'
+
+
+class Province(models.Model):
+    code = models.CharField(max_length=6)
+    name = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = 'province'
+
+
+class City(models.Model):
+    code = models.CharField(max_length=6)
+    name = models.CharField(max_length=20)
+    provincecode = models.CharField(max_length=6)
+
+    class Meta:
+        managed = False
+        db_table = 'city'
+
+
+class Area(models.Model):
+    code = models.CharField(max_length=6)
+    name = models.CharField(max_length=20)
+    citycode = models.CharField(max_length=6)
+
+    class Meta:
+        managed = False
+        db_table = 'area'

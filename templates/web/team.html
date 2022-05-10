@@ -1,0 +1,200 @@
+{% extends 'web/base_index.html' %}
+{% load static %}
+{% block userBody %}
+    <style>
+        .page-active {
+            background-color: #DB3545;
+            color: #F0F0F0 !important;
+        }
+
+        .card-img-top {
+            height: 174px;
+        }
+
+        .card-body h5 {
+            font-size: 18px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .card-body .col a {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .card-body .col a {
+            font-size: 12px;
+            text-decoration: none;
+            color: #666666;
+        }
+
+        .team-page {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .team-page a {
+            padding: 0 8px;
+            display: inline-block;
+            height: 25px;
+            border-radius: 15%;
+            border: 1px solid #ccc;
+            text-align: center;
+            line-height: 22px;
+            font-size: 12px;
+            color: #999;
+            vertical-align: middle;
+            margin: 0 5px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .team-page span {
+            font-size: 12px;
+            color: #333;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+
+        .team-page input {
+            display: inline-block;
+            width: 50px;
+            height: 22px;
+            line-height: 22px;
+            border: 1px solid #ccc;
+            border-radius: 18px;
+            text-align: center;
+            font-size: 12px;
+            color: #333;
+            vertical-align: middle;
+            padding: 0;
+        }
+
+        .team-page-btn {
+            width: auto;
+            padding: 0 8px;
+        }
+
+        .team-page-btn:hover {
+            background-color: #DB3545;
+            color: #F0F0F0;
+            transition: all .3s ease;
+        }
+
+        .team-page-btn:active {
+            background-color: #ffffff;
+            color: #DB3545;
+            transition: all .3s ease;
+        }
+
+    </style>
+
+    <div class="row container" id="teamContainer" style="margin: -120px auto 0;">
+        {% for team in teamInfo %}
+            <div class="col-md-3" style="padding: 15px">
+                <div class="card" style="width: 18rem;">
+                    <input type="hidden" value="{{ team.team_id }}">
+                    {% if team.team_icon is not None %}
+                        <img src="{{ team.team_icon }}" class="card-img-top" alt="...">
+                    {% else %}
+                        <img src="{% static 'assert/images/fj_vol_team.png' %}" class="card-img-top" alt="...">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ team.team_name }}</h5>
+                        <div class="row">
+                            <div class="col">
+                                <a class="card-text">队伍人数：5</a>
+                            </div>
+                            <div class="col text-end">
+                                <a class="card-text">队伍满意度</a>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider" style="border: 1px solid rgb(244,187,191)"></div>
+                    </div>
+                    <div class="card-body row" style="width: 100%">
+                        <div class="col">
+                            <img src="{% static 'assert/images/traning_icon.png' %}" alt="">
+                            <a>培训5.0</a>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'assert/images/smell_icon.png' %}" alt="">
+                            <a>合作5.0</a>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'assert/images/coopration_icon.png' %}" alt="">
+                            <a>计划5.0</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="team-page">
+        {% if pageIndex > 1 %}
+            <a class="team-page-btn" style="display: inline-block">首页</a>
+            <a class="team-page-btn" style="display: inline-block">上一页</a>
+        {% endif %}
+        {% for _ in ''|rjust:pageCount %}
+            {% if forloop.counter >= pageIndex|add:"-3" and forloop.counter <= pageCount|add:"-6" %}
+                {% if forloop.counter == pageIndex %}
+                    <a class="team-page-btn page-active">{{ forloop.counter }}</a>
+                {% elif forloop.counter <= pageIndex|add:"6" %}
+                    <a class="team-page-btn">{{ forloop.counter }}</a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if pageIndex < pageCount %}
+            <a class="team-page-btn" id="teamNextPage">下一页</a>
+            <a class="team-page-btn" id="teamLastPage">尾页</a>
+        {% endif %}
+        <span>当前第</span>
+        <input type="text" id="page-input" value="{{ pageIndex }}">
+        <span>页</span>
+        <a class="team-page-btn">跳转</a>
+        <span id="teamPageCountInfo">{{ pageIndex }}/{{ pageCount }}页 共{{ teamCount }}条</span>
+    </div>
+
+
+
+    <script type="text/javascript">
+
+        {#  分页控件  #}
+        $('.team-page').on('click', 'a', function () {
+            let catchIndex = $(this).text()
+            if (catchIndex === '上一页') {
+                let findIndex = $('.page-active').text()
+                $(location).attr('href', '../team?method=allWithPage&page=' + (parseInt(findIndex) - 1) + '&limit=16')
+            } else if (catchIndex === '下一页') {
+                let findIndex = $('.page-active').text()
+                $(location).attr('href', '../team?method=allWithPage&page=' + (parseInt(findIndex) + 1) + '&limit=16')
+            } else if (catchIndex === '首页') {
+                $(location).attr('href', '../team?method=allWithPage&page=1&limit=16')
+            } else if (catchIndex === '尾页') {
+                let pageInfo = $('#teamPageCountInfo').text()
+                let startIndex = pageInfo.toString().indexOf('/')
+                let lastPageIndex = pageInfo.toString().substr(startIndex + 1, 2)
+                console.log(pageInfo.toString().substr(startIndex + 1, 2))
+                $(location).attr('href', '../team?method=allWithPage&page=' + lastPageIndex + '&limit=16')
+            }else if (catchIndex === '跳转'){
+                let pageInfo = $('#teamPageCountInfo').text()
+                let startIndex = pageInfo.toString().indexOf('/')
+                let lastPageIndex = pageInfo.toString().substr(startIndex + 1, 2)
+                let findIndex = $('#page-input').val()
+                if (findIndex <= lastPageIndex){
+                    $(location).attr('href', '../team?method=allWithPage&page=' + findIndex + '&limit=16')
+                }else {
+                    $(location).attr('href', '../team?method=allWithPage&page=' + lastPageIndex + '&limit=16')
+                }
+            }else {
+                $(location).attr('href', '../team?method=allWithPage&page=' + catchIndex + '&limit=16')
+            }
+        })
+        {# 点击按钮到队伍详细信息 #}
+        $('#teamContainer').on('click','div', function (){
+            let rootElem = $(this)
+            let teamId = rootElem.children().children('input').val()
+            console.log(teamId)
+        })
+    </script>
+{% endblock userBody %}

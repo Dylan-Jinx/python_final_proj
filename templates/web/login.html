@@ -1,0 +1,159 @@
+{% extends 'web/base_index.html' %}
+{% load static %}
+{% block userBody %}
+    <style>
+        #login-content {
+            position: absolute;
+            left: 12%;
+            top: 30%;
+            padding: 0;
+        }
+
+        .login-input {
+            margin-top: 18px;
+            position: relative;
+        }
+
+        #login-wrapper {
+            padding: 0px 30px 0px 30px;
+        }
+
+        #login-wrapper span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #DB4353;
+            padding: 10px;
+        }
+
+        .login-input input {
+            width: 100%;
+            border: 1px solid #dfdfdf;
+            border-radius: 4px;
+            line-height: 36px;
+            height: 48px;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+            padding: 0 20px 0 40px;
+            transition: 0.3s;
+        }
+
+        .login-input img {
+            position: absolute;
+            left: 15px;
+            top: 30%;
+        }
+
+        #highlight-header {
+            color: #DB3545;
+            padding: 15px;
+            font-size: 24px;
+        }
+
+        .ban-highlight {
+            font-size: 16px;
+            color: #666;
+            text-decoration: none;
+            width: 40%;
+            display: inline-block;
+
+        }
+
+        .ban-highlight:hover {
+            color: #DB3545;
+            transition: all .3s ease;
+        }
+
+        .ban-highlight:active {
+            color: #666;
+            transition: all .3s ease;
+        }
+
+        #generateValidCode {
+            margin-left: 10px;
+            cursor: pointer;
+            border: 1px solid rgb(223, 223, 223);
+            text-align: center;
+            width: 35%;
+            height: 46px;
+            border-radius: 4px;
+            float: right;
+        }
+
+        #loginPageBtn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: 0;
+        }
+
+        #loginPageBtn:active {
+            color: #DB3453;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+    </style>
+
+    <script type="text/javascript">
+        function userLogin() {
+            let loginName = $('#userName').val()
+            let loginPwd = $('#userPwd').val()
+            console.log(loginName, loginPwd)
+            $.ajax({
+                method: 'POST',
+                data: {
+                    "method": "volunteerLogin",
+                    "login_name": loginName,
+                    "pwd": loginPwd
+                },
+                success: function (datas) {
+                    let code = datas.code;
+                    if (code == 200) {
+                        $(location).attr('href', '../../')
+                    } else if (code == 0) {
+                        $('#login_res_tip').text(datas.msg)
+                    }
+                }
+            })
+        }
+    </script>
+
+    <div id="login-content" class="card container">
+        <div class="row" style="width: 100%">
+            <div class="col">
+                <img style="width: 100%;" src="{% static 'assert/images/login_banner.png' %}" alt="">
+            </div>
+            <div class="col-4">
+                <div id="login-header" class="text-center">
+                    <div id="highlight-header" class="login-vol">志愿者登录</div>
+                    <a class="ban-highlight">志愿队伍登录</a>
+                    <a href="../../admin/login/" class="ban-highlight" style="margin-left: 60px;">管理部门登录</a>
+                </div>
+                <div class="dropdown-divider" style="width: 100%"></div>
+                <div id="login-wrapper">
+                    <div class="login-input" style="position: relative">
+                        <img src="{% static 'assert/images/login_name.png' %}">
+                        <input id="userName" type="text" maxlength="18" name="phone" placeholder="请输入身份证号">
+                    </div>
+                    <span id="login_name_tip"></span>
+                    <div class="login-input">
+                        <img src="{% static 'assert/images/login_pwd.png' %}">
+                        <input id="userPwd" type="password" name="id_card" placeholder="请输入密码">
+                    </div>
+                    <span id="login_pwd_tip"></span>
+                    <div class="login-input">
+                        <img src="{% static 'assert/images/login_valid_code.png' %}">
+                        <input type="text" maxlength="4" name="pwd" placeholder="请输入验证码">
+                        <span id="generateValidCode"></span>
+                    </div>
+                    <span id="login_res_tip"></span>
+                    <div class="login-input">
+                        <a class="btn btn-xl btn-danger" id="loginPageBtn" onclick="userLogin()">登 录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock userBody %}
