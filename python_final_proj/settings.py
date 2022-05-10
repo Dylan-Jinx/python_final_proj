@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app_web',
-    'app_admin'
+    'app_admin',
+    'templatestags',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +66,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'my_tag': 'templatestags.my_tag',
+            }
         },
+
     },
 ]
 

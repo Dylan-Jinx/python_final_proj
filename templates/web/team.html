@@ -194,6 +194,7 @@
         $('#teamContainer').on('click','div', function (){
             let rootElem = $(this)
             let teamId = rootElem.children().children('input').val()
+            $(location).attr('href', '/user/team/detail?team_id='+teamId)
             console.log(teamId)
         })
     </script>

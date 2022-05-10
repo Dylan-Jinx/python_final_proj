@@ -1,0 +1,75 @@
+{% extends 'web/base_index.html' %}
+{% load my_tag %}
+{% load static %}
+{% block userBody %}
+    <style>
+
+        .team-concact-title {
+            font-size: 28px;
+            font-weight: 600;
+            padding: 20px;
+        }
+
+        .team-concact-title span {
+            color: #009f95;
+        }
+
+        .team-detail-btn {
+            width: 30%;
+            color: #FB3454;
+            font-size: 14px;
+            background-color: transparent;
+            border: 1px solid #FB3454;
+            border-radius: 5px;
+            margin: 20px;
+        }
+
+        .team-name-show {
+            text-align: left;
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        .team-top-other-show {
+            margin-top: 20px;
+        }
+
+        .team-other-show {
+            margin-top: 5px;
+        }
+
+    </style>
+    <div class="row container" style="margin: -120px auto 0;">
+        {% for team in teamInfo %}
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-4">
+                        <img style="width: 100%" src="{% static 'assert/images/fj_vol_team.png' %}" alt="">
+                    </div>
+                    <div class="col-7 offset-1">
+                        <div class="team-name-show"><span>{{ team.team_name }}</span></div>
+                        <div class="team-top-other-show">队伍联络编号：<span>{{ team.team_id }}</span></div>
+                        <div class="team-other-show">人员规模：<span>3</span></div>
+                        <div class="team-other-show">正式人员：<span>5</span></div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="team-other-show">区域：<span>{{ ''|area_convert:team.team_area }}</span></div>
+                            <div class="team-other-show">成立日期：<span>{{ team.team_create_time|datetime_convert:team.team_create_time }}</span></div>
+                            <div class="team-other-show">区域：<span>{{ team.team_area }}</span></div>
+                        </div>
+                        <div class="col">
+                            <div class="team-other-show">区域：<span>{{ team.team_area }}</span></div>
+                            <div class="team-other-show">区域：<span>{{ team.team_area }}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="team-concact-title">队伍联络人：<span>{{ team.team_concact }}</span></div>
+                <button class="team-detail-btn">给他发站内信</button>
+                <button class="team-detail-btn">我要投诉</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock userBody %}

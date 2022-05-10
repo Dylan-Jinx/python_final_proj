@@ -33,7 +33,7 @@ class LoginView(View):
         return result
 
     def get(self, request):
-        return render(request, 'web/login.html', {'breadNav': '登录'})
+        return render(request, 'web/login.html', {'breadNav': {'登录'}})
 
     def post(self, request):
         datas = json.loads(json.dumps(request.POST))
@@ -66,13 +66,24 @@ class TeamView(View):
             team_count = VolunteerTeam.objects.count()
             page_count = team_count/int(request.GET.get('limit'))
             page_count = int(page_count) + 1
-            return render(request, 'web/team.html', {'breadNav': '志愿队伍', 'teamInfo': result, 'teamCount': team_count, 'pageIndex': int(page), 'pageCount': page_count})
-        return render(request, 'web/team.html', {'breadNav': '志愿队伍', 'teamInfo': None})
+            return render(request, 'web/team.html', {'breadNav': {'志愿队伍'}, 'teamInfo': result, 'teamCount': team_count, 'pageIndex': int(page), 'pageCount': page_count})
+        return render(request, 'web/team.html', {'breadNav': {'志愿队伍'}, 'teamInfo': None})
 
     def allWithPage(self, page, limit):
         datas = VolunteerTeam.objects.all()
         page_result = Paginator(datas, limit)
         return page_result.page(page)
+
+
+class TeamDetailView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(TeamDetailView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        teamId = request.GET.get('team_id')
+        data = VolunteerTeam.objects.filter(team_id=teamId)
+        return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data})
 
 
 class RegisterView(View):

@@ -36,6 +36,7 @@ urlpatterns = [
     path('user/login/', web.LoginView.as_view()),
     path('area/', web.AreaIndexView.as_view()),
     path('user/team/', web.TeamView.as_view()),
+    path('user/team/detail', web.TeamDetailView.as_view()),
     path('register/user/', web.RegisterView.as_view()),
     path('register/team/', web.RegisterView.as_view()),
 

@@ -305,7 +305,7 @@
             layer.confirm('你确定要删除吗', {icon: 3, btn: ['确定', '取消']}, function (index) {
                 layer.close(index)
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/volunteer?method=deleteById&user_id=' + id,
+                    url: '../volunteer?method=deleteById&user_id=' + id,
                     method: "DELETE",
                     contentType: 'application/json',
                     data: {
