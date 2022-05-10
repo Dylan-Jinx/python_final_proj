@@ -90,6 +90,22 @@
         #noactive a {
             color: #DB3543;
         }
+
+        .footer{
+            font-size: 14px;
+            color: #f0f0f0;
+        }
+        .friend-Link{
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #fff;
+            padding-bottom: 20px;
+            margin-top: 50px;
+            margin-right: 50px;
+        }
+
+        .friend-Link a{
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -148,7 +164,34 @@
         {% block userBody %}
         {% endblock userBody %}
     </div>
-    <div id="footer" class="card-footer"></div>
+    <div class="footer" id="footer" style="background-color: #1b293a;height: 300px;">
+        <div class="row container" style="margin: 0 auto">
+            <div class="col-8">
+                <div class="friend-Link">
+                    <span>友情链接</span>
+                    <a>民政部</a>
+                    <a>民政一体化政务服务平台</a>
+                    <a>中国文明网</a>
+                    <a>中国社会组织</a>
+                    <a>中国社会工作</a>
+                    <a>中华志愿者协会</a>
+                </div>
+                <div class="footer-contact">
+                    <p>客服电话:114514980114514
+                        <span style="margin-left: 50px;">技术支持：Dylan-Jinx</span>
+                    </p>
+                    <p>客服QQ群:1145141145
+                    </p>
+                    <p>
+                        Python程序设计期末课程设计-志愿者注册登记预约分配系统
+                    </p>
+                </div>
+            </div>
+            <div class="col-4">
+                <img style="width: 100%;padding: 10px;margin-top: 30px;" src="{% static 'assert/images/login_banner.png' %}" alt="">
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script type="text/javascript">
