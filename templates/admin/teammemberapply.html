@@ -1,0 +1,38 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% block mainbody %}
+
+    {#  显示数据表格  #}
+    <div class="layui-row layui-card">
+        <div class="layui-card">
+            <table id="team_member_apply_table" lay-filter="teamApplyTable"/>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        let mainTable = layui.table;
+        mainTable.render({
+            elem: '#dict_table',
+            url: '../manageteam?method=getAllInfo',
+            page: true,
+            text: '查询不到数据',
+            loading: true,
+            totalRow: true,
+            title: '数据字典类型信息',
+            types: 'checkbox',
+            toolbar: '#mainTableToolBarDemo',
+            cols: [[
+                {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
+                {field: 'dict_code', title: '字典编号', sort: true, fixed: 'left'},
+                {field: 'dict_type', title: '字典类型', sort: true, fixed: 'left'},
+                {field: 'dict_description', title: '描述信息', sort: true, fixed: 'left'},
+                {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
+            ]]
+        })
+
+    </script>
+
+
+
+{% endblock mainbody %}

@@ -35,13 +35,9 @@ class ApiResponse:
         result = {"code": 0, "msg": msg, "data": None}
         return result
 
-
-
-
-
-
-
-
+    def api_origin_ok(msg, data=None):
+        result = {"code": 0, "msg": msg, "data": data}
+        return result
 
     def api_reponse(data: QuerySet) -> object:
         try:

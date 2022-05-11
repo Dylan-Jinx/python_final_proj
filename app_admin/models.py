@@ -10,6 +10,8 @@ from json import JSONEncoder
 
 from django.db import models
 
+import app_web
+
 
 class DictDetail(models.Model):
     dict_code = models.CharField(max_length=255, blank=True, null=True)
@@ -43,8 +45,8 @@ class ProjectJoin(models.Model):
 
 
 class TeamMember(models.Model):
-    team_id = models.CharField(max_length=255, blank=True, null=True)
-    user_id = models.CharField(max_length=255, blank=True, null=True)
+    team = models.ForeignKey('VolunteerTeam', models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey('Volunteer', models.DO_NOTHING, blank=True, null=True)
     join_time = models.DateTimeField(blank=True, null=True)
     remove_flag = models.CharField(max_length=255, blank=True, null=True)
 

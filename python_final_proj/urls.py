@@ -30,6 +30,7 @@ urlpatterns = [
     path('teamcheck/', admin.VolunteerTeamCheckView.as_view()),
     path('regioncode/', admin.ThreeLevelProvinceAndCityAndAreaLinker.as_view()),
     path('dict/', admin.DataDict.as_view()),
+    path('manageteam/', admin.TeamManageView.as_view()),
 
 
     path('index/', web.AppIndex.as_view()),

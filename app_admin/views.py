@@ -4,14 +4,16 @@ import json
 import random
 import uuid
 
+import django.db
 import django.utils.timezone as timezone
 from django.core.paginator import Paginator
 from django.db import connection
+from django.db.models import Model, QuerySet
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import *
 from django.views import View
 
-from app_admin.models import Volunteer, VolunteerTeam, City, Province, Area, DictDetail, DictType
+from app_admin.models import *
 from utils.ApiResponse import ApiResponse
 from utils.generator.PersonalInfoGenerator import get_name, get_tel
 from utils.generator.username import get_userTeamName
@@ -206,9 +208,10 @@ class VolunteerTeamView(View):
         return render(request, 'admin/team.html', {"provinces": provinceData})
 
     def post(self, request):
-        for x in range(1000):
+        for x in range(100000):
             acode = self.randomAreaCode()
             aname = self.randomAreaName(acode)
+            print(acode)
             try:
                 VolunteerTeam.objects.create(
                     team_id=str(uuid.uuid4()).replace('-', ''),
@@ -276,7 +279,7 @@ class VolunteerTeamView(View):
         return ApiResponse.ok('密码重置成功')
 
     def randomAreaCode(self) -> object:
-        areaList = Area.objects.filter(code__startswith='35')
+        areaList = Area.objects.all()
         datas = areaList.values_list()
         index = random.randint(0, len(datas) - 1)
         return datas[index][1]
@@ -298,7 +301,8 @@ class VolunteerTeamView(View):
             datas = datas.filter(team_area__icontains=areaCode)
         if (teamName is not None) & (~(str(teamName).__eq__(''))):
             datas = datas.filter(team_name__icontains=teamName)
-        if (startTime is not None) & (endTime is not None) & (~(str(startTime).__eq__(''))) & (~(str(endTime).__eq__(''))):
+        if (startTime is not None) & (endTime is not None) & (~(str(startTime).__eq__(''))) & (
+                ~(str(endTime).__eq__(''))):
             datas = datas.filter(team_create_time__range=[startTime, endTime])
         datas = datas.filter(remove_flag=0)
         page_result = Paginator(datas, limit)
@@ -342,6 +346,39 @@ class VolunteerTeamCheckView(View):
             page = request.GET.get("page")
             limit = request.GET.get("limit")
             datas = VolunteerTeam.objects.filter(remove_flag=1, remark=None)
+            page_result = Paginator(datas, limit)
+            return ApiResponse.ok('获取成功', page_result.page(number=page), page_result.count)
+        except Exception as e:
+            print(e)
+
+
+class TeamManageView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(TeamManageView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        if str(request.GET.get('method')).__eq__('getAllInfo'):
+            result = self.get_all_team_member(request)
+            return JsonResponse(result)
+        return render(request, 'admin/teammemberapply.html')
+
+    def post(self, request):
+        datas = json.loads(json.dumps(request.POST))
+
+    def get_all_team_member(self, request):
+        try:
+            removeFlag = request.GET.get('remove_flag')
+            page = request.GET.get("page")
+            limit = request.GET.get("limit")
+            datas = TeamMember.objects.filter(remove_flag=removeFlag).all()
+            print(datas)
+
+
+
+
+
+
             page_result = Paginator(datas, limit)
             return ApiResponse.ok('获取成功', page_result.page(number=page), page_result.count)
         except Exception as e:
