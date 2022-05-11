@@ -26,3 +26,12 @@ def real_area_detail(value, arg):
 def datetime_convert(value, arg):
     value = dt.datetime.strftime(arg, '%Y-%m-%d')
     return value
+
+
+@register.filter()
+def string_check(value, arg):
+    if arg is not None:
+        value = True
+    else:
+        value = False
+    return value

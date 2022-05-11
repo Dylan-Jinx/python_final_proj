@@ -35,6 +35,7 @@ urlpatterns = [
     path('index/', web.AppIndex.as_view()),
     path('user/login/', web.LoginView.as_view()),
     path('area/', web.AreaIndexView.as_view()),
+    path('user/jointeam/', web.JoinTeamView.as_view()),
     path('user/team/', web.TeamView.as_view()),
     path('user/team/detail', web.TeamDetailView.as_view()),
     path('register/user/', web.RegisterView.as_view()),

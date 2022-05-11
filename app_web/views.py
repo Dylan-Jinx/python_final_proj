@@ -1,9 +1,11 @@
 import hashlib
 
 from django.core.paginator import Paginator
+from django.db.models import QuerySet
 from django.http import *
 from django.shortcuts import render
 # Create your views here.
+from django.utils import timezone
 from django.views import View
 import json
 
@@ -33,23 +35,32 @@ class LoginView(View):
         return result
 
     def get(self, request):
+        if str(request.GET.get('method')).__eq__('logout'):
+            request.session['is_login'] = False
+            del request.session["user_id"]
+            del request.session["nick_name"]
+            return HttpResponseRedirect('../../index')
         return render(request, 'web/login.html', {'breadNav': {'登录'}})
 
     def post(self, request):
         datas = json.loads(json.dumps(request.POST))
         if str(datas.get('method')).__eq__('volunteerLogin'):
             result = self.volunteerLogin(datas)
-            if result:
+
+            if result.count() > 0:
+                request.session['is_login'] = True
+                request.session['user_id'] = result.first().user_id
+                request.session['nick_name'] = result.first().nick_name
                 return JsonResponse({'code': 200, 'msg': '登录成功'})
             else:
                 return JsonResponse({'code': 0, 'msg': '账户名或密码错误'})
 
-    def volunteerLogin(self, datas) -> bool:
+    def volunteerLogin(self, datas) -> QuerySet:
         loginName = datas.get('login_name')
         loginPwd = str(datas.get('pwd'))
         realPwd = hashlib.md5(loginPwd.encode(encoding='UTF-8')).hexdigest()
         queryResult = Volunteer.objects.filter(id_card=loginName, pwd=realPwd)
-        return queryResult.count() > 0
+        return queryResult
 
 
 class TeamView(View):
@@ -82,8 +93,15 @@ class TeamDetailView(View):
 
     def get(self, request):
         teamId = request.GET.get('team_id')
+        userId = request.session['user_id']
         data = VolunteerTeam.objects.filter(team_id=teamId)
-        return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data})
+        if userId is not None:
+            joinStatu = TeamMember.objects.filter(team_id=teamId, user_id=userId)
+            if joinStatu.count() > 0:
+                return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': False})
+            else:
+                return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': True})
+        return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': True})
 
 
 class RegisterView(View):
@@ -120,3 +138,35 @@ class AreaIndexView(View):
 
     def get(self, request):
         return render(request, 'web/user_index.html')
+
+    
+class JoinTeamView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(JoinTeamView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        return render(request, 'web/user_index.html')
+    
+    def post(self, request):
+        datas = json.loads(json.dumps(request.POST))
+        if str(datas.get('method')).__eq__('applyTeam'):
+            if self.applyTeam(datas):
+                return JsonResponse(ApiResponse.ApiResponse.ok_simple('提交申请成功'))
+            else:
+                return JsonResponse(ApiResponse.ApiResponse.ok_simple('已经是该队伍的成员了'))
+
+    def applyTeam(self, datas) -> bool:
+        teamId = datas.get('team_id')
+        userId = datas.get('user_id')
+        datas = TeamMember.objects.filter(team_id=teamId,user_id=userId,)
+        if datas.count() == 0:
+            TeamMember.objects.create(
+                team_id=teamId,
+                user_id=userId,
+                join_time=timezone.datetime.now(),
+                remove_flag=0
+            )
+            return True
+        else:
+            return False

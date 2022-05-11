@@ -91,11 +91,12 @@
             color: #DB3543;
         }
 
-        .footer{
+        .footer {
             font-size: 14px;
             color: #f0f0f0;
         }
-        .friend-Link{
+
+        .friend-Link {
             margin-bottom: 20px;
             border-bottom: 1px dashed #fff;
             padding-bottom: 20px;
@@ -103,7 +104,7 @@
             margin-right: 50px;
         }
 
-        .friend-Link a{
+        .friend-Link a {
             padding: 10px;
         }
     </style>
@@ -120,6 +121,17 @@
         <div class="col-md" style="text-align: right;margin-top: 20px;margin-left: 40px;">
             <div id="login-box">
                 <dl class="address">
+                    {% if request.session.is_login is True %}
+                        <input type="hidden" value="{{ request.session.user_id }}">
+                        <a href="#" type="button" id="loginBtn"
+                           class=" btn btn-xs btn-light">{{ request.session.nick_name }}，你好！</a>
+                        <a href="../login?method=logout" type="button" id="loginBtn"
+                           class=" btn btn-xs btn-light">退出</a>
+                    {% else %}
+
+                        <a href="../../index?method=loginPage" type="button" id="loginBtn"
+                           class=" btn btn-xs btn-light">登录</a>
+                    {% endif %}
                     <a href="../index?method=registerRegPage" type="button" id="loginBtn" class=" btn btn-xs btn-light">志愿者注册</a>
                     <a href="../index?method=registerRegTeamPage" type="button" id="loginBtn"
                        class=" btn btn-xs btn-light">志愿队伍注册</a>
@@ -188,7 +200,8 @@
                 </div>
             </div>
             <div class="col-4">
-                <img style="width: 100%;padding: 10px;margin-top: 30px;" src="{% static 'assert/images/login_banner.png' %}" alt="">
+                <img style="width: 100%;padding: 10px;margin-top: 30px;"
+                     src="{% static 'assert/images/login_banner.png' %}" alt="">
             </div>
         </div>
     </div>

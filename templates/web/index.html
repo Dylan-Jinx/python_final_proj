@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load my_tag %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,7 +49,7 @@
             box-shadow: transparent;
         }
 
-        #loginBtn:active{
+        #loginBtn:active {
             color: #DB3545;
             transition: all .3s ease;
             background-color: #F0F0F0;
@@ -91,7 +92,7 @@
             display: inline-block;
         }
 
-        .mid-body-right-news ul li a:hover{
+        .mid-body-right-news ul li a:hover {
             color: #DB3545 !important;
             transition: all .3s ease-in-out;
         }
@@ -105,11 +106,12 @@
             display: inline-block;
         }
 
-        .footer{
+        .footer {
             font-size: 14px;
             color: #f0f0f0;
         }
-        .friend-Link{
+
+        .friend-Link {
             margin-bottom: 20px;
             border-bottom: 1px dashed #fff;
             padding-bottom: 20px;
@@ -117,7 +119,7 @@
             margin-right: 50px;
         }
 
-        .friend-Link a{
+        .friend-Link a {
             padding: 10px;
         }
     </style>
@@ -136,9 +138,18 @@
             <div class="col-md" style="text-align: right;margin-top: 20px;margin-left: 40px;">
                 <div id="login-box">
                     <dl class="address">
-                        <a href="../index?method=loginPage" type="button" id="loginBtn" class=" btn btn-xs btn-light">登录</a>
-                        <a href="../index?method=registerRegPage" type="button" id="loginBtn" class=" btn btn-xs btn-light">志愿者注册</a>
-                        <a href="../index?method=registerRegTeamPage" type="button" id="loginBtn" class=" btn btn-xs btn-light">志愿队伍注册</a>
+                        {% if request.session.is_login is True %}
+                            <input type="hidden" value="{{ request.session.user_id }}">
+                            <a href="#" type="button" id="loginBtn" class=" btn btn-xs btn-light">{{ request.session.nick_name }}，你好！</a>
+                            <a href="../user/login?method=logout" type="button" id="loginBtn" class=" btn btn-xs btn-light">退出</a>
+                        {% else %}
+                            <a href="../index?method=loginPage" type="button" id="loginBtn"
+                               class=" btn btn-xs btn-light">登录</a>
+                        {% endif %}
+                        <a href="../index?method=registerRegPage" type="button" id="loginBtn"
+                           class=" btn btn-xs btn-light">志愿者注册</a>
+                        <a href="../index?method=registerRegTeamPage" type="button" id="loginBtn"
+                           class=" btn btn-xs btn-light">志愿队伍注册</a>
                     </dl>
                 </div>
             </div>
@@ -231,33 +242,34 @@
             <img style="width: 100%" src="{% static 'assert/images/index_middle.png' %}" alt="">
         </div>
         <div class="footer align-bottom" id="footer" style="background-color: #1b293a;height: 300px;">
-        <div class="row container" style="margin: 0 auto">
-            <div class="col-8">
-                <div class="friend-Link">
-                    <span>友情链接</span>
-                    <a>民政部</a>
-                    <a>民政一体化政务服务平台</a>
-                    <a>中国文明网</a>
-                    <a>中国社会组织</a>
-                    <a>中国社会工作</a>
-                    <a>中华志愿者协会</a>
+            <div class="row container" style="margin: 0 auto">
+                <div class="col-8">
+                    <div class="friend-Link">
+                        <span>友情链接</span>
+                        <a>民政部</a>
+                        <a>民政一体化政务服务平台</a>
+                        <a>中国文明网</a>
+                        <a>中国社会组织</a>
+                        <a>中国社会工作</a>
+                        <a>中华志愿者协会</a>
+                    </div>
+                    <div class="footer-contact">
+                        <p>客服电话:114514980114514
+                            <span style="margin-left: 50px;">技术支持：Dylan-Jinx</span>
+                        </p>
+                        <p>客服QQ群:1145141145
+                        </p>
+                        <p>
+                            Python程序设计期末课程设计-志愿者注册登记预约分配系统
+                        </p>
+                    </div>
                 </div>
-                <div class="footer-contact">
-                    <p>客服电话:114514980114514
-                        <span style="margin-left: 50px;">技术支持：Dylan-Jinx</span>
-                    </p>
-                    <p>客服QQ群:1145141145
-                    </p>
-                    <p>
-                        Python程序设计期末课程设计-志愿者注册登记预约分配系统
-                    </p>
+                <div class="col-4">
+                    <img style="width: 100%;padding: 10px;margin-top: 30px;"
+                         src="{% static 'assert/images/login_banner.png' %}" alt="">
                 </div>
-            </div>
-            <div class="col-4">
-                <img style="width: 100%;padding: 10px;margin-top: 30px;" src="{% static 'assert/images/login_banner.png' %}" alt="">
             </div>
         </div>
-    </div>
     </div>
 </div>
 </body>
