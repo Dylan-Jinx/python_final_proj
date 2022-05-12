@@ -15,6 +15,7 @@ from django.views import View
 
 from app_admin.models import *
 from utils.ApiResponse import ApiResponse
+from utils.db_data_convert import query_result_convert
 from utils.generator.PersonalInfoGenerator import get_name, get_tel
 from utils.generator.username import get_userTeamName
 
@@ -54,9 +55,13 @@ class LoginView(View):
 
 class LogOutView(View):
     def get(self, request):
-        del request.session["user_id"]
-        del request.session["nick_name"]
-        return HttpResponseRedirect("/admin/login")
+        try:
+            del request.session["user_id"]
+            del request.session["nick_name"]
+            return HttpResponseRedirect("/admin/login")
+        except Exception as e:
+            print(e)
+            return HttpResponseRedirect("/admin/login")
 
 
 class IndexView(View):
@@ -208,7 +213,7 @@ class VolunteerTeamView(View):
         return render(request, 'admin/team.html', {"provinces": provinceData})
 
     def post(self, request):
-        for x in range(100000):
+        for x in range(10000):
             acode = self.randomAreaCode()
             aname = self.randomAreaName(acode)
             print(acode)
@@ -367,22 +372,20 @@ class TeamManageView(View):
         datas = json.loads(json.dumps(request.POST))
 
     def get_all_team_member(self, request):
-        try:
-            removeFlag = request.GET.get('remove_flag')
-            page = request.GET.get("page")
-            limit = request.GET.get("limit")
-            datas = TeamMember.objects.filter(remove_flag=removeFlag).all()
-            print(datas)
+        removeFlag = request.GET.get('remove_flag')
+        page = request.GET.get("page")
+        limit = request.GET.get("limit")
+        datas = TeamMember.objects.filter(remove_flag=removeFlag).all()
+        print(datas)
 
+        sql = "SELECT volunteer.user_name,volunteer.phone,volunteer.phone,volunteer.user_mail,volunteer.service_area,volunteer_team.team_name,join_time,team_member.team_id,team_member.user_id" \
+              " FROM volunteer,volunteer_team,team_member " \
+              "WHERE volunteer.user_id = %s AND volunteer_team.team_id = %s AND team_member.remove_flag = %s"
 
+        result = query_result_convert.origin_db_query(sql, ['e81db7cef2254352b71ecf2723af5d74',
+                                                            'd07bc7398ce642c5b665fb9f6935ed80', removeFlag])
 
-
-
-
-            page_result = Paginator(datas, limit)
-            return ApiResponse.ok('获取成功', page_result.page(number=page), page_result.count)
-        except Exception as e:
-            print(e)
+        return ApiResponse.ok_simple(data=result, count=result.__len__())
 
 
 # 数据字典

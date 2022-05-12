@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'app_web',
     'app_admin',
     'templatestags',
+    'utils',
 ]
 
 MIDDLEWARE = [
@@ -81,12 +82,18 @@ WSGI_APPLICATION = 'python_final_proj.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        # 'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'utils.mysql',
         'NAME': 'python_final_project',
         'USER': 'root',
         'PASSWORD': '12345678',
         'HOST': 'localhost',
         'PORT': '3306',
+        'DATABASE_OPTIONS:': {
+            'connect_timeout': 60,
+            'init_command': "SET sql_mode ='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        },
     }
 }
 
