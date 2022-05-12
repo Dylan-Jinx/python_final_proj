@@ -10,12 +10,23 @@
     </div>
 
     <script type="text/html" id="mainTableRowTool">
-
+        <div class="layui-btn-container">
+            <button type="button" id="applySuccess" class="layui-btn layui-btn-sm layui-bg-blue"
+                    lay-event="memberApplySuccess" data-bs-toggle="modal" data-bs-target="#memberApplyDetail">查看详情
+            </button>
+            <button type="button" id="applySuccess" class="layui-btn layui-btn-sm layui-bg-green"
+                    lay-event="memberApplySuccess">通过申请
+            </button>
+            <button type="button" id="appplyFail" class="layui-btn layui-btn-sm layui-bg-red"
+                    lay-event="memberApplyFail" data-bs-toggle="modal" data-bs-target="#memberApplyModal">驳回申请
+            </button>
+        </div>
     </script>
 
 
     <script type="text/javascript">
         let mainTable = layui.table;
+        {# 表格渲染 #}
         mainTable.render({
             elem: '#team_member_apply_table',
             url: '../manageteam?method=getAllInfo&remove_flag=0',
@@ -61,8 +72,42 @@
             ]]
         })
 
+        {# 每行工具栏的触发事件 #}
+        mainTable.on('tool(teamApplyTable)', function (obj){
+            let layEvent = obj.event;
+            let rowData = obj.data;
+            let teamId = rowData.team_id;
+            let userId = rowData.user_id;
+            console.log(layEvent);
+            console.log(rowData);
+            console.log(teamId);
+            console.log(userId);
+            switch (layEvent){
+                case "memberApplyDetail":
+                    console.log('查看详情')
+                    break;
+                case "memberApplySuccess":
+                    console.log('通过申请')
+                    break;
+                case "memberApplyFail":
+                    console.log('驳回申请')
+                    break;
+            }
+        })
 
 
+
+
+
+        function mainTableReloadAllDatas() {
+            mainTable.reload('team_member_apply_table', {
+                url: '../manageteam?method=getAllInfo&remove_flag=0',
+                page: {
+                    curr: 1
+                },
+                where: {}
+            }, true)
+        }
         function convertTimeWithTType(datetime) {
             let time = new Date(datetime)
             let year = time.getFullYear();
