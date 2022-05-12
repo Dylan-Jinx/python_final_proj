@@ -11,11 +11,13 @@ from django.db import connection
 from django.db.models import Model, QuerySet
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import *
+from django.template.response import *
 from django.views import View
 
 from app_admin.models import *
 from utils.ApiResponse import ApiResponse
 from utils.db_data_convert import query_result_convert
+from utils.generator import PersonalInfoGenerator
 from utils.generator.PersonalInfoGenerator import get_name, get_tel
 from utils.generator.username import get_userTeamName
 
@@ -90,6 +92,9 @@ class VolunteerView(View):
         elif str(request.GET.get('method')).__eq__('resetPwd'):
             result = self.resetPwd(request)
             return JsonResponse(result, safe=False)
+        elif str(request.GET.get('method')).__eq__('testAddVol'):
+            self.add_volunteer()
+            return HttpResponse('添加成功')
         return render(request, "admin/volunteer.html")
 
     def post(self, request):
@@ -120,18 +125,39 @@ class VolunteerView(View):
         except Exception as e:
             print(e)
 
-    def add_volunteer(self, datas):
-        Volunteer.objects.create(
-            user_id=str(uuid.uuid4()).replace('-', ''),
-            nick_name=datas.get('nick_name'),
-            user_name=datas.get('user_name'),
-            user_mail=datas.get('user_mail'),
-            qq=datas.get('qq'),
-            phone=datas.get('phone'),
-            id_card=datas.get('id_card'),
-            pwd=hashlib.md5(str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest()
-        )
-        return ApiResponse.ok("添加成功")
+    def randomAreaCode(self) -> object:
+        areaList = Area.objects.all()
+        datas = areaList.values_list()
+        index = random.randint(0, len(datas) - 1)
+        return datas[index][1]
+
+    def randomAreaName(self, areaCode) -> object:
+        areaName = Area.objects.filter(code=areaCode).first().name
+        return areaName
+
+    def add_volunteer(self):
+        try:
+            for x in range(100000):
+                acode = self.randomAreaCode()
+                aname = self.randomAreaName(acode)
+                Volunteer.objects.create(
+                    user_id=str(uuid.uuid4()).replace('-', ''),
+                    nick_name=PersonalInfoGenerator.get_name(),
+                    user_name=PersonalInfoGenerator.get_name(),
+                    user_mail=PersonalInfoGenerator.get_email(),
+                    qq=PersonalInfoGenerator.get_qq(),
+                    phone=PersonalInfoGenerator.get_tel(),
+                    id_card=PersonalInfoGenerator.get_idnum(),
+                    service_area=acode,
+                    hometown=acode,
+                    position=random.randint(1, 7),
+                    education=random.randint(1, 6),
+                    wechat='wx_id' + str(uuid.uuid4()).replace('-', ''),
+                    pwd=hashlib.md5(str('123456').encode(encoding='UTF-8')).hexdigest()
+                )
+                print(f'生成标记：{x}')
+        except Exception as e:
+            print(e)
 
     def update_volunteer(self, datas):
         Volunteer.objects \
@@ -303,7 +329,7 @@ class VolunteerTeamView(View):
         limit = request.GET.get("limit")
         datas = VolunteerTeam.objects
         if (areaCode is not None) & (~(str(areaCode).__eq__(''))):
-            datas = datas.filter(team_area__icontains=areaCode)
+            datas = datas.filter(team_area__istartswith=areaCode)
         if (teamName is not None) & (~(str(teamName).__eq__(''))):
             datas = datas.filter(team_name__icontains=teamName)
         if (startTime is not None) & (endTime is not None) & (~(str(startTime).__eq__(''))) & (
@@ -311,7 +337,6 @@ class VolunteerTeamView(View):
             datas = datas.filter(team_create_time__range=[startTime, endTime])
         datas = datas.filter(remove_flag=0)
         page_result = Paginator(datas, limit)
-        print(datas.query)
         return ApiResponse.ok('获取成功', page_result.page(number=page), page_result.count)
 
 
@@ -370,6 +395,12 @@ class TeamManageView(View):
 
     def post(self, request):
         datas = json.loads(json.dumps(request.POST))
+        if str(datas.get('method')).__eq__('applyStatus'):
+            result = self.applyStatus(datas)
+            if result:
+                return JsonResponse(ApiResponse.ok('操作成功'))
+            else:
+                return JsonResponse(ApiResponse.ok('操作失败'))
 
     def get_all_team_member(self, request):
         removeFlag = request.GET.get('remove_flag')
@@ -386,6 +417,18 @@ class TeamManageView(View):
                                                             'd07bc7398ce642c5b665fb9f6935ed80', removeFlag])
 
         return ApiResponse.ok_simple(data=result, count=result.__len__())
+
+    def applyStatus(self, datas):
+        try:
+            userId = datas.get('user_id', None)
+            status = datas.get('remove_flag', None)
+            with connection.cursor() as cursor:
+                cursor.execute('update team_member set remove_flag=%s where user_id=%s', [status, userId])
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
 
 
 # 数据字典

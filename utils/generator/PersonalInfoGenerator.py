@@ -119,7 +119,7 @@ def get_tel():
     tel += str(random.choice(phone_number))
     ran = ''
     for i in range(7):
-        ran += str(random.randint(0, 9))
+        ran += str(random.randint(0, 10))
     tel += ran
     return tel
 

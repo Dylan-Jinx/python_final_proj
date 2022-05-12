@@ -91,13 +91,14 @@
             border-bottom: 5px solid #FB3454 !important;
         }
 
-        .team-introduction{
+        .team-introduction {
             padding: 30px;
             font-size: 18px;
             font-weight: 400;
             line-height: 1.5;
         }
-        .join-team-btn button{
+
+        .join-team-btn button {
             margin-left: 260px;
             margin-top: 15px;
             width: 160px;
@@ -105,7 +106,7 @@
             background: #FFA000;
         }
 
-        .join-team-btn button:hover{
+        .join-team-btn button:hover {
             transition: all .3s ease;
             background: #FFC93F;
         }
@@ -166,14 +167,37 @@
                         </li>
                         <li class="row team-comment" style="display: none">
                             <div class="">
-                                <textarea style="height: 120px;width: 100%;border:1px solid #ccc;margin-left: -10px;margin-top:10px;"placeholder="来这里说点什么吧。。。"></textarea>
+                                <textarea
+                                        style="height: 120px;width: 100%;border:1px solid #ccc;margin-left: -10px;margin-top:10px;"
+                                        placeholder="来这里说点什么吧。。。" id="commentContent"></textarea>
                             </div>
                             <div class="" style="margin-top:10px">
-                                <button class="btn btn-danger">发表评论</button>
+                                <button class="btn btn-danger" id="userCommmentTeam">发表评论</button>
                             </div>
+                            {% for comment in comments %}
+                                {% if forloop.counter == 1 %}
+                                    <div class="" style="margin-top: 40px;margin-left: -10px;font-size: 18px;font-weight: 600;">
+                                        评论区：
+                                    </div>
+                                {% endif %}
+                                <div class="comment-show" style="margin-top: 10px;padding: 20px;">
+                                    <div class="card text-center" style="">
+                                        <div class="card-header text-start">
+                                            {{ forloop.counter }}楼
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="card-text" style="text-align: left">{{ comment.comment_content }}</p>
+                                        </div>
+                                        <div class="card-footer text-start">
+                                            <div class="text-start">评论时间：{{ comment.create_time }}
+                                            <div class="text-end"><button class="btn btn-sm btn-danger">举报</button></div></div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </li>
                     </div>
-
                 </div>
             </div>
             <div class="col-4">
@@ -197,34 +221,58 @@
             let rootElem = $(this)
             console.log(rootElem)
             $('.team-info-detail li').attr('class', 'list-group-item')
-            $('.team-info-detail-display li').attr('style','display:none')
+            $('.team-info-detail-display li').attr('style', 'display:none')
             rootElem.addClass('team-info-detail-active')
             let showVal = rootElem.text()
 
-            if (showVal === '留言咨询'){
+            if (showVal === '留言咨询') {
                 console.log(2)
                 $('.team-comment').attr('style', 'display:block')
-            }else if (showVal === '发起的项目'){
+            } else if (showVal === '发起的项目') {
 
-            }else if (showVal === '队伍简介'){
+            } else if (showVal === '队伍简介') {
                 $('.team-introduction').attr('style', 'display:block')
             }
             console.log(rootElem.text())
         })
 
-        $('#joinTeamBtn').click(function (){
+        $('#joinTeamBtn').click(function () {
             let teamId = $('.team-top-other-show span').text()
             let userId = $('.address input').val()
             console.log(233)
             $.ajax({
-                url:'../jointeam/',
+                url: '../jointeam/',
                 method: 'POST',
-                data:{
-                    'team_id':teamId,
-                    'user_id':userId,
-                    'method':'applyTeam'
+                data: {
+                    'team_id': teamId,
+                    'user_id': userId,
+                    'method': 'applyTeam'
                 },
 
+            })
+        })
+
+        $('#userCommmentTeam').click(function (){
+            let teamId = $('.team-top-other-show span').text()
+            let userId = $('.address input').val()
+            let commentContent = $('#commentContent').val()
+            $.ajax({
+                url: '../teamcomment/',
+                method: 'POST',
+                data:{
+                    "method": "submitTeamComment",
+                    "user_id": userId,
+                    "team_id": teamId,
+                    "comment": commentContent
+                },
+                dataType: "json",
+                success: function (datas){
+                    if (datas.msg === '发表评论成功'){
+                        layer.msg('发表评论成功', {time: 2000, anim: 5, icon: 1});
+                        $('#commentContent').val('')
+                        location.reload()
+                    }
+                }
             })
         })
     </script>

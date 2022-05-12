@@ -120,6 +120,7 @@
             </li>
 
             <li class="layui-nav-item layui-hide-xs"><a href="/volunteer">志愿者信息</a></li>
+{#            <li class="layui-nav-item layui-hide-xs"><a href="/team">志愿团体信息</a></li>#}
             <li class="layui-nav-item layui-hide-xs"><a href="/team">志愿团体信息</a></li>
             <li class="layui-nav-item layui-hide-xs"><a href="">志愿项目信息</a></li>
         </ul>
@@ -149,7 +150,7 @@
             <ul class="layui-nav layui-nav-tree" lay-filter="test">
                 <li class="layui-nav-item layui-nav-itemed">
                     <a class="" href="javascript:;">志愿者</a>
-                    <dl class="layui-nav-child">
+                    <dl class="layui-nav-child proj-nav-indic">
                         <dd><a href="/volunteer">志愿者信息</a></dd>
                         <dd><a href="javascript:;">评分等级</a></dd>
                     </dl>
@@ -183,7 +184,7 @@
     </div>
 
     <div class="layui-body">
-        <div style="padding: 15px">
+        <div style="padding: 15px" class="core-content">
             <!-- 内容主体区域 -->
             {% block mainbody %}
             {% endblock mainbody %}
@@ -220,6 +221,12 @@
         });
 
     });
+
+    function partitionPageRefresh(url) {
+        $('.core-content').load(url)
+    }
+
+
 </script>
 </body>
 </html>

@@ -44,6 +44,14 @@ class ProjectJoin(models.Model):
         db_table = 'project_join'
 
 
+class TeamComment(models.Model):
+    team_id = models.CharField(max_length=255, blank=True, null=True)
+    user_id = models.CharField(max_length=255, blank=True, null=True)
+    comment_content = models.TextField(blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    ctr_flag = models.CharField(max_length=1, blank=True, null=True)
+
+
 class TeamMember(models.Model):
     team = models.ForeignKey('VolunteerTeam', models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey('Volunteer', models.DO_NOTHING, blank=True, null=True)

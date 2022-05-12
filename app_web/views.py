@@ -75,9 +75,11 @@ class TeamView(View):
             limit = request.GET.get('limit')
             result = self.allWithPage(page, limit)
             team_count = VolunteerTeam.objects.count()
-            page_count = team_count/int(request.GET.get('limit'))
+            page_count = team_count / int(request.GET.get('limit'))
             page_count = int(page_count) + 1
-            return render(request, 'web/team.html', {'breadNav': {'志愿队伍'}, 'teamInfo': result, 'teamCount': team_count, 'pageIndex': int(page), 'pageCount': page_count})
+            return render(request, 'web/team.html',
+                          {'breadNav': {'志愿队伍'}, 'teamInfo': result, 'teamCount': team_count, 'pageIndex': int(page),
+                           'pageCount': page_count})
         return render(request, 'web/team.html', {'breadNav': {'志愿队伍'}, 'teamInfo': None})
 
     def allWithPage(self, page, limit):
@@ -92,16 +94,26 @@ class TeamDetailView(View):
         return result
 
     def get(self, request):
-        teamId = request.GET.get('team_id')
-        userId = request.session['user_id']
-        data = VolunteerTeam.objects.filter(team_id=teamId)
-        if userId is not None:
-            joinStatu = TeamMember.objects.filter(team_id=teamId, user_id=userId)
-            if joinStatu.count() > 0:
-                return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': False})
-            else:
-                return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': True})
-        return render(request, 'web/team_detail.html', {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': True})
+        try:
+            teamId = request.GET.get('team_id')
+            userId = request.session['user_id']
+            commentInfo = TeamComment.objects.filter(team_id=teamId)
+            data = VolunteerTeam.objects.filter(team_id=teamId)
+            if userId is not None:
+                joinStatu = TeamMember.objects.filter(team_id=teamId, user_id=userId)
+                if joinStatu.count() > 0:
+                    return render(request, 'web/team_detail.html',
+                                  {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': False,
+                                   'comments': commentInfo})
+                else:
+                    return render(request, 'web/team_detail.html',
+                                  {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': True,
+                                   'comments': commentInfo})
+            return render(request, 'web/team_detail.html',
+                          {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': True, 'comments': None})
+        except Exception as e:
+            return render(request, 'web/team_detail.html',
+                          {'breadNav': {'志愿队伍', '队伍详细'}, 'teamInfo': data, 'joinStatus': True})
 
 
 class RegisterView(View):
@@ -139,7 +151,7 @@ class AreaIndexView(View):
     def get(self, request):
         return render(request, 'web/user_index.html')
 
-    
+
 class JoinTeamView(View):
     def dispatch(self, request, *args, **kwargs):
         result = super(JoinTeamView, self).dispatch(request, *args, **kwargs)
@@ -147,7 +159,7 @@ class JoinTeamView(View):
 
     def get(self, request):
         return render(request, 'web/user_index.html')
-    
+
     def post(self, request):
         datas = json.loads(json.dumps(request.POST))
         if str(datas.get('method')).__eq__('applyTeam'):
@@ -159,7 +171,7 @@ class JoinTeamView(View):
     def applyTeam(self, datas) -> bool:
         teamId = datas.get('team_id')
         userId = datas.get('user_id')
-        datas = TeamMember.objects.filter(team_id=teamId,user_id=userId,)
+        datas = TeamMember.objects.filter(team_id=teamId, user_id=userId, )
         if datas.count() == 0:
             TeamMember.objects.create(
                 team_id=teamId,
@@ -169,4 +181,37 @@ class JoinTeamView(View):
             )
             return True
         else:
+            return False
+
+
+class TeamCommentView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(TeamCommentView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def post(self, request):
+        datas = json.loads(json.dumps(request.POST))
+        if str(datas.get('method')).__eq__('submitTeamComment'):
+            if self.submitTeamComment(datas):
+                return JsonResponse(ApiResponse.ApiResponse.ok('发表评论成功'))
+            else:
+                return JsonResponse(ApiResponse.ApiResponse.ok('发表评论成功'))
+
+    def submitTeamComment(self, datas):
+        try:
+            comment = datas.get('comment', None)
+            userId = datas.get('user_id', None)
+            teamId = datas.get('team_id', None)
+            if comment is not None:
+                TeamComment.objects.create(
+                    comment_content=comment,
+                    team_id=teamId,
+                    user_id=userId,
+                    ctr_flag=0,
+                    create_time=timezone.datetime.now()
+                )
+                return True
+            return False
+        except Exception as e:
+            print(e)
             return False

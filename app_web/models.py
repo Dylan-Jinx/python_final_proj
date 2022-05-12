@@ -186,3 +186,18 @@ class Area(models.Model):
     class Meta:
         managed = False
         db_table = 'area'
+
+
+class TeamComment(models.Model):
+    id = models.IntegerField(primary_key=True)
+    team_id = models.CharField(max_length=255, blank=True, null=True)
+    user_id = models.CharField(max_length=255, blank=True, null=True)
+    comment_content = models.TextField(blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    ctr_flag = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'team_comment'
+
+
