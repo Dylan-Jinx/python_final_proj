@@ -13,7 +13,7 @@ from django.db import models
 
 class DictDetail(models.Model):
     dict_code = models.CharField(max_length=255, blank=True, null=True)
-    dict_detail_id = models.CharField(max_length=255, blank=True, null=True)
+    dict_detail_id = models.IntegerField(blank=True, null=True)
     dict_info = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
@@ -77,26 +77,31 @@ class TeamProject(models.Model):
 
 
 class Volunteer(models.Model):
-    user_id = models.CharField(max_length=255, blank=True, null=True, verbose_name='用户id')
-    nick_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='昵称')
-    user_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='身份证号')
-    id_card = models.CharField(max_length=255, blank=True, null=True, verbose_name='密码')
-    pwd = models.CharField(max_length=255, blank=True, null=True, verbose_name='密码')
-    phone = models.CharField(max_length=255, blank=True, null=True, verbose_name='联系电话')
-    user_mail = models.CharField(max_length=255, blank=True, null=True, verbose_name='邮箱')
-    qq = models.CharField(max_length=255, blank=True, null=True, verbose_name='QQ号')
-    wechat = models.CharField(max_length=255, blank=True, null=True, verbose_name='微信号')
-    hometown = models.CharField(max_length=255, blank=True, null=True, verbose_name='籍贯')
-    education = models.CharField(max_length=255, blank=True, null=True, verbose_name='教育背景')
-    position = models.CharField(max_length=255, blank=True, null=True, verbose_name='职业')
-    service_area = models.CharField(max_length=255, blank=True, null=True, verbose_name='服务区域')
-    user_icon = models.TextField(blank=True, null=True, verbose_name='用户头像')
-    remove_flag = models.CharField(max_length=255, blank=True, null=True, verbose_name='删除标志')
+    user_id = models.CharField(max_length=255, blank=True, null=True)
+    nick_name = models.CharField(max_length=255, blank=True, null=True)
+    user_name = models.CharField(max_length=255, blank=True, null=True)
+    id_card = models.CharField(max_length=255, blank=True, null=True)
+    pwd = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    user_mail = models.CharField(max_length=255, blank=True, null=True)
+    qq = models.CharField(max_length=255, blank=True, null=True)
+    wechat = models.CharField(max_length=255, blank=True, null=True)
+    hometown = models.CharField(max_length=255, blank=True, null=True)
+    education = models.CharField(max_length=255, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)
+    service_area = models.CharField(max_length=255, blank=True, null=True)
+    user_icon = models.TextField(blank=True, null=True)
+    punctual = models.CharField(max_length=255, blank=True, null=True)
+    service_atitude = models.CharField(max_length=255, blank=True, null=True)
+    profess_level = models.CharField(max_length=255, blank=True, null=True)
+    train_time = models.DateTimeField(blank=True, null=True)
+    service_type = models.CharField(max_length=255, blank=True, null=True)
+    remove_flag = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'volunteer'
-        verbose_name = verbose_name_plural = '志愿者信息'
+
 
 
 class VolunteerComment(models.Model):
@@ -125,19 +130,6 @@ class VolunteerDetail(models.Model):
     class Meta:
         managed = False
         db_table = 'volunteer_detail'
-
-
-class VolunteerRank(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user_id = models.CharField(max_length=255, blank=True, null=True)
-    punctual = models.CharField(max_length=255, blank=True, null=True)
-    service_atitude = models.CharField(max_length=255, blank=True, null=True)
-    profess_level = models.CharField(max_length=255, blank=True, null=True)
-    train_time = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'volunteer_rank'
 
 
 class VolunteerTeam(models.Model):

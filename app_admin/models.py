@@ -15,7 +15,7 @@ import app_web
 
 class DictDetail(models.Model):
     dict_code = models.CharField(max_length=255, blank=True, null=True)
-    dict_detail_id = models.CharField(max_length=255, blank=True, null=True)
+    dict_detail_id = models.IntegerField(blank=True, null=True)
     dict_info = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
@@ -86,7 +86,7 @@ class TeamProject(models.Model):
         db_table = 'team_project'
 
 
-class Volunteer(models.Model):
+class   Volunteer(models.Model):
     user_id = models.CharField(max_length=255, blank=True, null=True)
     nick_name = models.CharField(max_length=255, blank=True, null=True)
     user_name = models.CharField(max_length=255, blank=True, null=True)
@@ -101,12 +101,17 @@ class Volunteer(models.Model):
     position = models.CharField(max_length=255, blank=True, null=True)
     service_area = models.CharField(max_length=255, blank=True, null=True)
     user_icon = models.TextField(blank=True, null=True)
+    punctual = models.FloatField(blank=True, null=True)
+    service_atitude = models.FloatField(blank=True, null=True)
+    profess_level = models.FloatField(blank=True, null=True)
+    train_time = models.IntegerField(blank=True, null=True)
+    service_type = models.CharField(max_length=255, blank=True, null=True)
     remove_flag = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'volunteer'
-        verbose_name = verbose_name_plural = '志愿者信息'
+
 
 
 class VolunteerComment(models.Model):
@@ -135,19 +140,6 @@ class VolunteerDetail(models.Model):
     class Meta:
         managed = False
         db_table = 'volunteer_detail'
-
-
-class VolunteerRank(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user_id = models.CharField(max_length=255, blank=True, null=True)
-    punctual = models.CharField(max_length=255, blank=True, null=True)
-    service_atitude = models.CharField(max_length=255, blank=True, null=True)
-    profess_level = models.CharField(max_length=255, blank=True, null=True)
-    train_time = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'volunteer_rank'
 
 
 class VolunteerTeam(models.Model):

@@ -36,12 +36,12 @@ urlpatterns = [
     path('index/', web.AppIndex.as_view()),
     path('user/login/', web.LoginView.as_view()),
     path('area/', web.AreaIndexView.as_view()),
+    path('user/detail/', web.UserDetailView.as_view()),
     path('user/jointeam/', web.JoinTeamView.as_view()),
     path('user/team/', web.TeamView.as_view()),
     path('user/team/detail', web.TeamDetailView.as_view()),
     path('user/teamcomment/', web.TeamCommentView.as_view()),
-    path('register/user/', web.RegisterView.as_view()),
-    path('register/team/', web.RegisterView.as_view()),
+    path('user/register/', web.RegisterView.as_view()),
 
     path('base/', web.BaseView.as_view()),
 

@@ -1,4 +1,5 @@
 import hashlib
+import uuid
 
 from django.core.paginator import Paginator
 from django.db.models import QuerySet
@@ -22,10 +23,6 @@ class AppIndex(View):
 
         if str(request.GET.get('method')).__eq__('loginPage'):
             return HttpResponseRedirect('../user/login/')
-        if str(request.GET.get('method')).__eq__('registerRegPage'):
-            return HttpResponseRedirect('../register/')
-        if str(request.GET.get('method')).__eq__('registerRegTeamPage'):
-            return HttpResponseRedirect('../register/team/')
         return render(request, 'web/index.html')
 
 
@@ -97,7 +94,7 @@ class TeamDetailView(View):
         try:
             teamId = request.GET.get('team_id')
             userId = request.session['user_id']
-            commentInfo = TeamComment.objects.filter(team_id=teamId)
+            commentInfo = TeamComment.objects.filter(team_id=teamId,ctr_flag__in=[0, 1])
             data = VolunteerTeam.objects.filter(team_id=teamId)
             if userId is not None:
                 joinStatu = TeamMember.objects.filter(team_id=teamId, user_id=userId)
@@ -122,7 +119,31 @@ class RegisterView(View):
         return result
 
     def get(self, request):
-        return render(request, 'web/register.html')
+        method = request.GET.get("method")
+        if str(method).__eq__('vol'):
+            return render(request, 'web/register.html', {'breadNav': {'志愿者注册'}})
+        elif str(method).__eq__('team'):
+            return render(request, 'web/team_register.html', {'breadNav': {'志愿队伍注册'}})
+
+    def post(self, request):
+        datas = json.loads(json.dumps(request.POST))
+        userCount = Volunteer.objects.filter(phone=datas.get('phone')).count()
+        if userCount > 0:
+            return JsonResponse(ApiResponse.ApiResponse.ok(msg="该手机号码已经被注册"))
+        Volunteer.objects.create(
+            user_id=str(uuid.uuid4()).replace('-', ''),
+            phone=datas.get('phone'),
+            nick_name=datas.get('nick_name'),
+            user_name=datas.get('real_name'),
+            id_card=datas.get('id_card'),
+            pwd=hashlib.md5(str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest(),
+            punctual=5,
+            train_time=0,
+            service_atitude=5,
+            profess_level=5,
+            remove_flag=0
+        )
+        return JsonResponse(ApiResponse.ApiResponse.ok(msg="注册成功"))
 
 
 class TeamRegisterView(View):
@@ -215,3 +236,18 @@ class TeamCommentView(View):
         except Exception as e:
             print(e)
             return False
+
+
+class UserDetailView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(UserDetailView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        userId = request.GET.get("user_id")
+        datas = Volunteer.objects.filter(user_id=userId).first()
+        teamCount = TeamMember.objects.filter(user_id=userId).count()
+        commentCount = TeamComment.objects.filter(user_id=userId).count()
+        print(teamCount)
+        print(datas)
+        return render(request, 'web/user_detail.html', {'breadNav': {'用户信息'}, 'volunteer': datas, 'team_count': teamCount, 'comment_count': commentCount})

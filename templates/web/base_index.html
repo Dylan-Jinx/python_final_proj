@@ -116,8 +116,8 @@
     <div id="header" class="row container"
          style="margin-left: auto;margin-right: auto;position: absolute;margin-left: 180px;">
         <div class="col-md" style="text-align: left;margin-top: 20px;">
-            <p>
-                <img class="index-logo" src="{% static 'assert/images/index_logo.png' %}">
+            <p style="color: red;font-weight: 600;font-size: 18px;text-align: center">
+                <img class="index-logo" src="{% static 'assert/images/logo.png' %}">志愿者注册登记预约分配系统
             </p>
         </div>
         <div class="col-md" style="text-align: right;margin-top: 20px;margin-left: 40px;">
@@ -125,18 +125,19 @@
                 <dl class="address">
                     {% if request.session.is_login is True %}
                         <input type="hidden" value="{{ request.session.user_id }}">
-                        <a href="#" type="button" id="loginBtn"
+                        <a href="../../user/detail?user_id={{ request.session.user_id }}" type="button" id="loginBtn"
                            class=" btn btn-xs btn-light">{{ request.session.nick_name }}，你好！</a>
-                        <a href="../login?method=logout" type="button" id="loginBtn"
+                        <a href="../../user/login?method=logout" type="button" id="loginBtn"
                            class=" btn btn-xs btn-light">退出</a>
                     {% else %}
 
                         <a href="../../index?method=loginPage" type="button" id="loginBtn"
                            class=" btn btn-xs btn-light">登录</a>
                     {% endif %}
-                    <a href="../index?method=registerRegPage" type="button" id="loginBtn" class=" btn btn-xs btn-light">志愿者注册</a>
-                    <a href="../index?method=registerRegTeamPage" type="button" id="loginBtn"
-                       class=" btn btn-xs btn-light">志愿队伍注册</a>
+                        <a href="../../user/register?method=vol" type="button" id="loginBtn"
+                           class=" btn btn-xs btn-light">志愿者注册</a>
+                        <a href="../../user/register?method=team" type="button" id="loginBtn"
+                           class=" btn btn-xs btn-light">志愿队伍注册</a>
                 </dl>
             </div>
         </div>
@@ -183,12 +184,12 @@
             <div class="col-8">
                 <div class="friend-Link">
                     <span>友情链接</span>
-                    <a>民政部</a>
-                    <a>民政一体化政务服务平台</a>
-                    <a>中国文明网</a>
-                    <a>中国社会组织</a>
-                    <a>中国社会工作</a>
-                    <a>中华志愿者协会</a>
+                    <a>厦门理工学院</a>
+                    <a>厦门理工学院</a>
+                    <a>厦门理工学院</a>
+                    <a>厦门理工学院</a>
+                    <a>厦门理工学院</a>
+                    <a>厦门理工学院</a>
                 </div>
                 <div class="footer-contact">
                     <p>客服电话:114514980114514
@@ -203,7 +204,7 @@
             </div>
             <div class="col-4">
                 <img style="width: 100%;padding: 10px;margin-top: 30px;"
-                     src="{% static 'assert/images/login_banner.png' %}" alt="">
+                     src="{% static 'assert/images/学校标志.png' %}" alt="">
             </div>
         </div>
     </div>

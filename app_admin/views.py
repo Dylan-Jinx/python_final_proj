@@ -2,6 +2,8 @@ import datetime
 import hashlib
 import json
 import random
+import threading
+import time
 import uuid
 
 import django.db
@@ -14,6 +16,7 @@ from django.shortcuts import *
 from django.template.response import *
 from django.views import View
 
+import app_web.models
 from app_admin.models import *
 from utils.ApiResponse import ApiResponse
 from utils.db_data_convert import query_result_convert
@@ -135,29 +138,46 @@ class VolunteerView(View):
         areaName = Area.objects.filter(code=areaCode).first().name
         return areaName
 
+    def randomDataArray(self, start, end, num):
+        random.seed(timezone.datetime.now())
+        return random.sample(range(start, end), num)
+
     def add_volunteer(self):
-        try:
-            for x in range(100000):
-                acode = self.randomAreaCode()
-                aname = self.randomAreaName(acode)
-                Volunteer.objects.create(
-                    user_id=str(uuid.uuid4()).replace('-', ''),
-                    nick_name=PersonalInfoGenerator.get_name(),
-                    user_name=PersonalInfoGenerator.get_name(),
-                    user_mail=PersonalInfoGenerator.get_email(),
-                    qq=PersonalInfoGenerator.get_qq(),
-                    phone=PersonalInfoGenerator.get_tel(),
-                    id_card=PersonalInfoGenerator.get_idnum(),
-                    service_area=acode,
-                    hometown=acode,
-                    position=random.randint(1, 7),
-                    education=random.randint(1, 6),
-                    wechat='wx_id' + str(uuid.uuid4()).replace('-', ''),
-                    pwd=hashlib.md5(str('123456').encode(encoding='UTF-8')).hexdigest()
-                )
-                print(f'生成标记：{x}')
-        except Exception as e:
-            print(e)
+        count = 1
+        volunteer_list = []
+        while True:
+            random.seed(timezone.datetime.now())
+            acode = self.randomAreaCode()
+            aname = self.randomAreaName(acode)
+            vol_obj = app_web.models.Volunteer(
+                user_id=str(uuid.uuid4()).replace('-', ''),
+                nick_name=PersonalInfoGenerator.get_name(),
+                user_name=PersonalInfoGenerator.get_name(),
+                user_mail=PersonalInfoGenerator.get_email(),
+                qq=PersonalInfoGenerator.get_qq(),
+                phone=PersonalInfoGenerator.get_tel(),
+                id_card=PersonalInfoGenerator.get_idnum(),
+                service_area=acode,
+                hometown=acode,
+                position=random.randint(1, 7),
+                education=random.randint(1, 9),
+                wechat='wx_id' + str(uuid.uuid4()).replace('-', ''),
+                pwd=hashlib.md5(str('123456').encode(encoding='UTF-8')).hexdigest(),
+                service_type=self.randomDataArray(1, 21, 4),
+                punctual=random.random() * 5,
+                train_time=random.randint(0, 3000),
+                service_atitude=random.random() * 5,
+                profess_level=random.random() * 5,
+                remove_flag=0
+            )
+            count = count + 1
+            volunteer_list.append(vol_obj)
+            if count % 10 == 0:
+                Volunteer.objects.bulk_create(volunteer_list)
+                volunteer_list.clear()
+            if count == 1000:
+                break
+            print(f'生成标记：{count}')
 
     def update_volunteer(self, datas):
         Volunteer.objects \

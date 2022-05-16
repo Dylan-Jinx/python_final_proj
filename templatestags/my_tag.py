@@ -8,6 +8,11 @@ register = template.Library()
 
 
 @register.filter()
+def access_result_convert(value, arg):
+    value = str(arg)[0:3]
+    return value
+
+@register.filter()
 def area_convert(value, arg):
     value = Area.objects.filter(code=arg).first().name
     return value

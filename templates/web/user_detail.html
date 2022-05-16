@@ -1,0 +1,290 @@
+{% extends 'web/base_index.html' %}
+{% load static %}
+{% load my_tag %}
+{% block userBody %}
+    <style>
+        .col-2 .list-group .list-group-item {
+            text-align: center;
+            height: 50px;
+            vertical-align: middle;
+            border-radius: 0;
+            border: 0;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .list-group .list-group-item:hover {
+        {#transition: all .3s ease;#} border-left: 5px solid #fb3454 !important;
+            background: linear-gradient(to right, rgba(251, 52, 84, 0.12), #f0f0f0);
+            color: #fb3454;
+        }
+
+        .detail-active {
+        {#transition: all .3s ease;#} border-left: 5px solid #fb3454 !important;
+            background: linear-gradient(to right, rgba(251, 52, 84, 0.12), #f0f0f0);
+            color: #fb3454;
+        }
+
+        .updateVolInfo {
+            width: 200px;
+            height: 40px;
+            background-color: transparent;
+            color: #fb3454;
+        }
+
+        .updateVolInfo:hover {
+            background-color: #fb3454;
+            color: #f0f0f0;
+        }
+
+        .updateVolInfo:active {
+            background-color: #fb3454;
+            color: #f0f0f0;
+        }
+
+        .contact-info div {
+            margin-top: 10px;
+        }
+
+        .showinfoimg {
+            width: auto;
+        }
+
+        .dashline {
+            border-bottom: 1px dashed #0d6efd;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+    </style>
+
+    <div class="row container" style="margin: 0 auto; margin-top: -100px;">
+        <div class="col-2">
+            <div style="">
+                <ul class="list-group">
+                    <li class="list-group-item detail-active">我的首页</li>
+                    <li class="list-group-item">修改资料</li>
+                    <li class="list-group-item">志愿者证</li>
+                    <li class="list-group-item">我的信用</li>
+                    <li class="list-group-item">站内信</li>
+                    <li class="list-group-item">我的好友</li>
+                    <li class="list-group-item">动态评论</li>
+                    <li class="list-group-item">我的评价</li>
+                    <li class="list-group-item">投诉举报</li>
+                    <li class="list-group-item">我的学习</li>
+                    <li class="list-group-item">我的表彰</li>
+                    <li class="list-group-item">我的兑换</li>
+                    <li class="list-group-item">下载证明</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col">
+            <div id="my_detail">
+                <div class="row">
+                    <div class="col-2">
+                        <img style="border: 0;" class="img-thumbnail" alt=""
+                             src="{% static 'assert/images/user_detail_icon.png' %}">
+                    </div>
+                    <div class="col-4">
+                        <div style="font-size: 22px;font-weight: 500;">欢迎回来，{{ volunteer.user_name }}</div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-danger updateVolInfo">修改资料</button>
+                        </div>
+                    </div>
+                    <div class="col-4 contact-info">
+                        <div style="font-size: 18px;font-weight: 500;">电话：{{ volunteer.phone }}</div>
+                        <div style="font-size: 18px;font-weight: 500;">邮箱：{{ volunteer.user_mail }}</div>
+                        <div style="font-size: 18px;font-weight: 500;">QQ：{{ volunteer.qq }}</div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/total_time.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">{{ ''|access_result_convert:volunteer.punctual }}</li>
+                                <li style="color: #333333">总时长（小时）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/sort_site.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">999+</li>
+                                <li style="color: #333333">当前站点排名</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/star_vol.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">0</li>
+                                <li style="color: #333333">星级志愿者</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/fen.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">999</li>
+                                <li style="color: #333333">积分</li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashline"></div>
+                <div class="row mt-5">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/jointeam.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 600;">
+                                <li style="color: #fb3454">{{ team_count }}</li>
+                                <li style="color: #333333">加入志愿团体个数</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/projectcount.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 600;">
+                                <li style="color: #fb3454">0</li>
+                                <li style="color: #333333">参与志愿项目</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/traningtime.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 600;">
+                                <li style="color: #fb3454">{{ volunteer.train_time }}</li>
+                                <li style="color: #333333">培训时长（小时）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/goods.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">0</li>
+                                <li style="color: #333333">表彰（次）</li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashline"></div>
+                <div class="row mt-5">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/msginnersite.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #6767fc">0</li>
+                                <li style="color: #333333">站内信（条）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/friendapply.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #6767fc;">0</li>
+                                <li style="color: #333333">好友申请（条）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/comment.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">{{ comment_count }}</li>
+                                <li style="color: #333333">评论（条）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/detailreport.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">0</li>
+                                <li style="color: #333333">举报（次）</li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashline"></div>
+                <div class="row mt-5">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/detailpunctual.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">{{ ''|access_result_convert:volunteer.punctual }}</li>
+                                <li style="color: #333333">守时程度（分）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/sort_site.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">{{ ''|access_result_convert:volunteer.service_atitude }}</li>
+                                <li style="color: #333333">服务态度（分）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/star_vol.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">{{ ''|access_result_convert:volunteer.profess_level }}</li>
+                                <li style="color: #333333">专业水平（分）</li>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="showinfoimg" src="{% static 'assert/images/toteamcomment.png' %}">
+                            </div>
+                            <div class="col" style="font-size: 20px;font-weight: 500;">
+                                <li style="color: #666666">0</li>
+                                <li style="color: #333333">评价（条）</li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashline"></div>
+            </div>
+        </div>
+    </div>
+{% endblock userBody %}
