@@ -175,7 +175,7 @@ class VolunteerView(View):
             if count % 10 == 0:
                 Volunteer.objects.bulk_create(volunteer_list)
                 volunteer_list.clear()
-            if count == 1000:
+            if count == 100000:
                 break
             print(f'生成标记：{count}')
 
@@ -432,10 +432,8 @@ class TeamManageView(View):
         sql = "SELECT volunteer.user_name,volunteer.phone,volunteer.phone,volunteer.user_mail,volunteer.service_area,volunteer_team.team_name,join_time,team_member.team_id,team_member.user_id" \
               " FROM volunteer,volunteer_team,team_member " \
               "WHERE volunteer.user_id = %s AND volunteer_team.team_id = %s AND team_member.remove_flag = %s"
-
-        result = query_result_convert.origin_db_query(sql, ['e81db7cef2254352b71ecf2723af5d74',
-                                                            'd07bc7398ce642c5b665fb9f6935ed80', removeFlag])
-
+        result = query_result_convert.origin_db_query(sql)
+        print(result)
         return ApiResponse.ok_simple(data=result, count=result.__len__())
 
     def applyStatus(self, datas):

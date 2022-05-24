@@ -12,6 +12,7 @@ import json
 
 from app_web.models import *
 from utils import ApiResponse
+from utils.db_data_convert import query_result_convert
 
 
 class AppIndex(View):
@@ -20,7 +21,6 @@ class AppIndex(View):
         return result
 
     def get(self, request):
-
         if str(request.GET.get('method')).__eq__('loginPage'):
             return HttpResponseRedirect('../user/login/')
         return render(request, 'web/index.html')
@@ -34,6 +34,8 @@ class LoginView(View):
     def get(self, request):
         if str(request.GET.get('method')).__eq__('logout'):
             request.session['is_login'] = False
+            request.session["user_id"] = ""
+            request.session["nick_name"] = ""
             del request.session["user_id"]
             del request.session["nick_name"]
             return HttpResponseRedirect('../../index')
@@ -94,7 +96,7 @@ class TeamDetailView(View):
         try:
             teamId = request.GET.get('team_id')
             userId = request.session['user_id']
-            commentInfo = TeamComment.objects.filter(team_id=teamId,ctr_flag__in=[0, 1])
+            commentInfo = TeamComment.objects.filter(team_id=teamId, ctr_flag__in=[0, 1])
             data = VolunteerTeam.objects.filter(team_id=teamId)
             if userId is not None:
                 joinStatu = TeamMember.objects.filter(team_id=teamId, user_id=userId)
@@ -130,19 +132,26 @@ class RegisterView(View):
         userCount = Volunteer.objects.filter(phone=datas.get('phone')).count()
         if userCount > 0:
             return JsonResponse(ApiResponse.ApiResponse.ok(msg="该手机号码已经被注册"))
-        Volunteer.objects.create(
-            user_id=str(uuid.uuid4()).replace('-', ''),
-            phone=datas.get('phone'),
-            nick_name=datas.get('nick_name'),
-            user_name=datas.get('real_name'),
-            id_card=datas.get('id_card'),
-            pwd=hashlib.md5(str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest(),
-            punctual=5,
-            train_time=0,
-            service_atitude=5,
-            profess_level=5,
-            remove_flag=0
-        )
+        # Volunteer.objects.create(
+        #     user_id=str(uuid.uuid4()).replace('-', ''),
+        #     phone=datas.get('phone'),
+        #     nick_name=datas.get('nick_name'),
+        #     user_name=datas.get('real_name'),
+        #     id_card=datas.get('id_card'),
+        #     pwd=hashlib.md5(str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest(),
+        #     punctual=5.0,
+        #     train_time=0,
+        #     service_atitude=5.0,
+        #     profess_level=5.0,
+        #     remove_flag=0
+        # )
+        sql = "insert into volunteer(user_id,phone,nick_name,user_name,id_card,pwd,punctual,train_time,service_atitude,profess_level,remove_flag)" \
+              "value(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,0)"
+        result = query_result_convert.origin_db_query(sql, [str(uuid.uuid4()).replace('-', ''), datas.get('phone'),
+                                                            datas.get('nick_name'), datas.get('real_name'),
+                                                            datas.get('id_card'), hashlib.md5(
+                str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest(), 5.0, 0, 5.0, 5.0])
+        print(result)
         return JsonResponse(ApiResponse.ApiResponse.ok(msg="注册成功"))
 
 
@@ -250,4 +259,6 @@ class UserDetailView(View):
         commentCount = TeamComment.objects.filter(user_id=userId).count()
         print(teamCount)
         print(datas)
-        return render(request, 'web/user_detail.html', {'breadNav': {'用户信息'}, 'volunteer': datas, 'team_count': teamCount, 'comment_count': commentCount})
+        return render(request, 'web/user_detail.html',
+                      {'breadNav': {'用户信息'}, 'volunteer': datas, 'team_count': teamCount,
+                       'comment_count': commentCount})
