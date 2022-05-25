@@ -372,6 +372,9 @@ class VolunteerTeamCheckView(View):
         elif str(request.GET.get('method')).__eq__('getAllInfo'):
             result = self.get_all_volunteer_team_check_page(request)
             return JsonResponse(result)
+        elif str(request.GET.get('method')).__eq__('searchTeamByName'):
+            result = self.search_team_by_name(request)
+            return JsonResponse(result)
         return render(request, 'admin/teamcheck.html')
 
     def post(self, request):
@@ -401,6 +404,12 @@ class VolunteerTeamCheckView(View):
         except Exception as e:
             print(e)
 
+    def search_team_by_name(self, request):
+        teamName = request.GET.get("team_name")
+        datas = VolunteerTeam.objects.filter(remove_flag=1, team_name__contains=teamName)
+        print(datas)
+        print(datas.query)
+        return ApiResponse.ok('获取成功', datas, 0)
 
 class TeamManageView(View):
     def dispatch(self, request, *args, **kwargs):

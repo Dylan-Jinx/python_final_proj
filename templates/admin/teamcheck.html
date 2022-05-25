@@ -39,6 +39,42 @@
         </div>
     </script>
 
+     {#  查询代码  #}
+    <script type="text/javascript">
+        function complexQuery() {
+            var DISABLED = 'layui-btn-disabled';
+            $('#queryBtn').addClass(DISABLED);
+            $('#queryTeamName').attr('disabled', 'disabled');
+            let queryTeamName = $('#queryTeamName').val();
+            console.log(queryTeamName);
+            mainTable.reload('volunteer_team_check_table', {
+                url: '../teamcheck?method=searchTeamByName',
+                page: {
+                    curr: 1
+                },
+                where: {
+                    team_name: queryTeamName,
+                }
+            }, true)
+            $('#queryTeamName').removeClass(DISABLED);
+            $('#queryTeamName').removeAttr('disabled');
+            $('#queryBtn').removeClass(DISABLED);
+            $('#queryBtn').removeAttr('disabled');
+        }
+
+        function mainTableReloadAllDatas() {
+            mainTable.reload('voluteer_team_table', {
+                url: '../team?method=getAllInfo&remove_flag=0',
+                page: {
+                    curr: 1
+                },
+                where: {
+                    queryVolName: ''
+                }
+            }, true)
+        }
+    </script>
+
     {#  渲染数据表格以及操作  #}
     <script type="text/javascript">
         let data;

@@ -158,7 +158,7 @@ class TeamRegisterView(View):
         if loginNameCount > 0:
             return JsonResponse(ApiResponse.ApiResponse.ok(msg="登录名已被注册"))
         sql = "insert into volunteer_team(team_id,team_name,team_login_name,team_pwd,team_concact,team_concact_phone,team_intro,team_create_time,team_area,remove_flag)" \
-              "value(%s,%s,%s,%s,%s,%s,%s,%s,%s,0)"
+              "value(%s,%s,%s,%s,%s,%s,%s,%s,%s,1)"
         result = query_result_convert.origin_db_query(sql, [str(uuid.uuid4()).replace('-', ''), datas.get('team_name'),
                                                             datas.get('login_name'), hashlib.md5(
                 str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest(), datas.get('contact_name'),
