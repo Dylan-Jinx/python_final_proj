@@ -3,6 +3,254 @@
 {% load my_tag %}
 {% block userBody %}
 
-志愿队伍注册
+    <style>
+        .input-tip {
+            position: relative;
+            top: -30%;
+            left: 40%;
+            font-size: 18px;
+            color: #fb3454;
+            font-weight: 500;
+        }
+
+        .vol-text {
+            text-indent: 2em;
+            line-height: 2;
+            font-size: 18px;
+            font-weight: bolder;
+        }
+    </style>
+
+    <div class="container row" id="registerForm" style="margin: 0 auto;margin-top: -50px;">
+        <div class="h4" style="border-left: 5px solid #fb3454;">志愿队伍账户信息</div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: 20px;">志愿队伍名</label>
+            <input type="text" id="formTeamName" class="form-control" style="width: 450px;" placeholder="请输入志愿队伍名">
+            <span class="input-tip">{{ username_psg }}</span>
+        </div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: 20px;">志愿队伍账号</label>
+            <input type="text" id="formTeamLoginName" class="form-control" style="width: 450px;"
+                   placeholder="请输入志愿队伍登录名">
+            <span class="input-tip">{{ username_psg }}</span>
+        </div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: -10px;">密码</label>
+            <input type="password" id="formTeamPwd" class="form-control" style="width: 450px;"
+                   placeholder="请输入密码">
+            <span class="input-tip">{{ pwd_msg }}</span>
+        </div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: -10px;">确认密码</label>
+            <input type="password" id="confirmPwd" class="form-control" style="width: 450px;"
+                   placeholder="请再次输入密码确认">
+            <span class="input-tip">{{ confirm_pwd_msg }}</span>
+        </div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: -10px;">请选择区域</label>
+            <div class="">
+                <div class="layui-col-md2">
+                    <select class="form-select" id="teamSearchProvince">
+                        <option value="0" disabled selected>请选择省</option>
+                        <option value="1" selected="selected">不限</option>
+                        {% for province in provinces %}
+                            <option value={{ province.code }}>{{ province.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="layui-col-md2" id="divSearchCity">
+                    <select class="form-select" id="teamSearchCity">
+                        <option value="0" disabled selected>请选择市</option>
+                        <option value="1" selected="selected">不限</option>
+                    </select>
+                </div>
+                <div class="layui-col-md2" id="divSearchArea">
+                    <select class="form-select" id="teamSearchArea">
+                        <option value="0" disabled selected>请选择县</option>
+                        <option value="1" selected="selected">不限</option>
+                    </select>
+                </div>
+            </div>
+            <span class="input-tip">{{ phone }}</span>
+        </div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: -10px;">联系人</label>
+            <input type="text" id="formContactName" class="form-control" style="width: 450px;" placeholder="请输入联系人名称">
+            <span class="input-tip">{{ phone }}</span>
+        </div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: -10px;">联系方式</label>
+            <input type="text" id="formContactPhone" class="form-control" style="width: 450px;" placeholder="请输入联系人号码">
+            <span class="input-tip">{{ phone }}</span>
+        </div>
+        <div class="mb-3" style="position: relative">
+            <label for="disabledTextInput" class="form-label h5" style="margin-top: -10px;">队伍介绍</label>
+            <textarea type="text" id="formTeamIntro" class="form-control" style="width: 450px;"
+                      placeholder="请输入队伍介绍"></textarea>
+            <span class="input-tip">{{ phone }}</span>
+        </div>
+        <div class="mb-3" style="margin: 0 auto;text-align: center">
+            <button id="submitVolunteerBtn" class="btn btn-lg" style="background-color: #fb3454;color: #f0f0f0;">
+                申请注册志愿队伍
+            </button>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        $(function (){
+            $('select').val(0)
+            $('input').val("")
+        })
+
+        $('#submitVolunteerBtn').click(function () {
+            registerVol();
+        })
+
+        function isRegisterUserName(nickName) {
+            var patrn = /^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){4,19}$/;
+            if (!patrn.exec(nickName)) return false;
+            return true;
+        }
+
+        function isMobilePhone(phone) {
+            var patrn = /^1[3|4|5|7|8][0-9]\d{4,8}$/;
+            if (!patrn.exec(phone)) {
+                return false;
+            }
+            return true;
+        }
+
+        function isPwd(pwd) {
+            var patrn = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z\\W]{6,18}$/;
+            if (!patrn.exec(pwd)) {
+                return false;
+            }
+            return true;
+        }
+
+        function isIdCard(idCard) {
+            var patrn = /^[1-9]\d{5}(18|19|20|(3\d))\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
+            if (!patrn.exec(idCard)) {
+                return false;
+            }
+            return true;
+        }
+
+        function registerVol() {
+            let teamName = $('#formTeamName').val();
+            let pwd = $('#formTeamPwd').val();
+            let confirmPwd = $('#confirmPwd').val();
+            let contactPhone = $('#formContactPhone').val();
+            let loginName = $('#formTeamLoginName').val();
+            let contactName = $('#formContactName').val();
+            let teamInfo = $('#formTeamIntro').val();
+            let provinceSelected = $('#teamSearchProvince').val();
+            let citySelected = $('#teamSearchCity').val();
+            let areaSelected = $('#teamSearchArea').val();
+            console.log(provinceSelected, citySelected, areaSelected);
+            let policyCode = null;
+            if (!(provinceSelected == 1)) {
+                policyCode = provinceSelected.substr(0,2);
+            }
+            if (!(citySelected == 1)) {
+                policyCode = citySelected.substr(0,4);
+            }
+            if (!(areaSelected == 1)) {
+                policyCode = areaSelected;
+            }
+            console.log(policyCode);
+            flag = true;
+            if (teamName === "") {
+                $('#formTeamName').parent().children('span').attr("style", "display:block;").text("请输入志愿队伍名称")
+                flag = false;
+            }
+            if (contactName === "") {
+                $('#formContactName').parent().children('span').attr("style", "display:block;").text("请输入联系人")
+                flag = false;
+            }
+            if (confirmPwd !== pwd) {
+                $('#confirmPwd').parent().children('span').attr("style", "display:block;").text("两次输入的密码不一致")
+                flag = false;
+            }
+            if (!isPwd(pwd)) {
+                $('#formTeamPwd').parent().children('span').attr("style", "display:block;").text("输入的密码必须包含字母和数字，且在6-18位之间")
+                flag = false;
+            }
+            if (!isRegisterUserName(loginName)) {
+                $('#formTeamLoginName').parent().children('span').attr("style", "display:block;").text("输入的登录名不合法,只能输入1-30个以字母开头的字串")
+                flag = false;
+            }
+            if (!isMobilePhone(contactPhone)) {
+                $('#formContactPhone').parent().children('span').attr("style", "display:block;").text("输入的手机号码不合法")
+                flag = false;
+            }
+            if (flag) {
+                $.ajax({
+                    url: "../../team/register/",
+                    method: "POST",
+                    data: {
+                        "team_name": teamName,
+                        "login_name":loginName,
+                        "contact_name": contactName,
+                        "pwd": pwd,
+                        "phone": contactPhone,
+                        "team_info":teamInfo,
+                        "policy_code":policyCode
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        let msg = data.msg;
+                        if (msg === "登录名已被注册") {
+                            alert(msg)
+                        } else {
+                            alert("注册成功")
+                            $(location).attr('href', '../../user/login/');
+                        }
+                    }
+                })
+            }
+        }
+
+    </script>
+
+    {#  控件改变交互逻辑  #}
+    <script type="text/javascript">
+        $('#teamSearchProvince').change(function (obj) {
+            console.log('value of selected has changed')
+            let provinceCode = $('#teamSearchProvince').val();
+            $.ajax({
+                url: '../../regioncode?method=getCitiesByProvinceCode&province_code=' + provinceCode,
+                method: 'GET',
+                success: function (data) {
+                    $('#teamSearchCity').children().remove()
+                    let cityPlaceholder = "<option value='0' disabled selected>请选择市</option>";
+                    let cityNotLimit = "<option value='1' selected>不限</option>";
+                    $('#teamSearchCity').append(cityPlaceholder).append(cityNotLimit)
+                    data.data.forEach((item, index) => {
+                        $('#teamSearchCity').append("<option value=" + item.code + " selected>" + item.name + "</option>")
+                    })
+                }
+            })
+        })
+
+        $('#teamSearchCity').change(function (obj) {
+            console.log('value of selected has changed')
+            let cityCode = $('#teamSearchCity').val();
+            $.ajax({
+                url: '../../regioncode?method=getAreasByCityCode&city_code=' + cityCode,
+                method: 'GET',
+                success: function (data) {
+                    $('#teamSearchArea').children().remove()
+                    let areaPlaceholder = "<option value='0' disabled selected>请选择县</option>";
+                    let areaNotLimit = "<option value='1' selected>不限</option>";
+                    $('#teamSearchArea').append(areaPlaceholder).append(areaNotLimit)
+                    data.data.forEach((item, index) => {
+                        $('#teamSearchArea').append("<option value=" + item.code + " selected>" + item.name + "</option>")
+                    })
+                }
+            })
+        })
+    </script>
 
 {% endblock userBody %}

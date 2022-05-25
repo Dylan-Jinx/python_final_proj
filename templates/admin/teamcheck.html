@@ -3,6 +3,27 @@
 {% block mainbody %}
 
 
+    <div class="layui-row layui-card">
+        <form class="layui-panel" action="" lay-filter="teamComplexQuery">
+            <div class=" layui-form-item layui-row layui-col-space15">
+                <div class="layui-col-md1">
+                    <label class="layui-form-label" style="padding: 9px 1px;">查询条件</label>
+                </div>
+                <div class="layui-col-md3">
+                    <input type="text" name="queryTeamName" id="queryTeamName" placeholder="请输入志愿队伍名"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-col-md2">
+                    <button id="queryBtn" type="button" class="layui-btn layui-bg-blue"
+                            onclick="complexQuery()">查询
+                    </button>
+                    <button class="layui-btn layui-bg-orange" type="reset" onclick="mainTableReloadAllDatas()">重置
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="layui-card">
         <table id="volunteer_team_check_table" lay-filter="volunteerTeamCheck"></table>
     </div>

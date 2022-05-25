@@ -1,5 +1,6 @@
 import hashlib
 import uuid
+from datetime import datetime
 
 from django.core.paginator import Paginator
 from django.db.models import QuerySet
@@ -125,26 +126,14 @@ class RegisterView(View):
         if str(method).__eq__('vol'):
             return render(request, 'web/register.html', {'breadNav': {'志愿者注册'}})
         elif str(method).__eq__('team'):
-            return render(request, 'web/team_register.html', {'breadNav': {'志愿队伍注册'}})
+            provinceData = Province.objects.all()
+            return render(request, 'web/team_register.html', {'breadNav': {'志愿队伍注册'}, "provinces": provinceData})
 
     def post(self, request):
         datas = json.loads(json.dumps(request.POST))
         userCount = Volunteer.objects.filter(phone=datas.get('phone')).count()
         if userCount > 0:
             return JsonResponse(ApiResponse.ApiResponse.ok(msg="该手机号码已经被注册"))
-        # Volunteer.objects.create(
-        #     user_id=str(uuid.uuid4()).replace('-', ''),
-        #     phone=datas.get('phone'),
-        #     nick_name=datas.get('nick_name'),
-        #     user_name=datas.get('real_name'),
-        #     id_card=datas.get('id_card'),
-        #     pwd=hashlib.md5(str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest(),
-        #     punctual=5.0,
-        #     train_time=0,
-        #     service_atitude=5.0,
-        #     profess_level=5.0,
-        #     remove_flag=0
-        # )
         sql = "insert into volunteer(user_id,phone,nick_name,user_name,id_card,pwd,punctual,train_time,service_atitude,profess_level,remove_flag)" \
               "value(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,0)"
         result = query_result_convert.origin_db_query(sql, [str(uuid.uuid4()).replace('-', ''), datas.get('phone'),
@@ -162,6 +151,22 @@ class TeamRegisterView(View):
 
     def get(self, request):
         return render(request, 'web/team_register.html')
+
+    def post(self, request):
+        datas = json.loads(json.dumps(request.POST))
+        loginNameCount = VolunteerTeam.objects.filter(team_login_name=datas.get('login_name')).count()
+        if loginNameCount > 0:
+            return JsonResponse(ApiResponse.ApiResponse.ok(msg="登录名已被注册"))
+        sql = "insert into volunteer_team(team_id,team_name,team_login_name,team_pwd,team_concact,team_concact_phone,team_intro,team_create_time,team_area,remove_flag)" \
+              "value(%s,%s,%s,%s,%s,%s,%s,%s,%s,0)"
+        result = query_result_convert.origin_db_query(sql, [str(uuid.uuid4()).replace('-', ''), datas.get('team_name'),
+                                                            datas.get('login_name'), hashlib.md5(
+                str(datas.get('pwd')).encode(encoding='UTF-8')).hexdigest(), datas.get('contact_name'),
+                                                            datas.get('phone'), datas.get('team_info'),
+                                                            timezone.datetime.now(),
+                                                            datas.get('policy_code')])
+        print(result)
+        return JsonResponse(ApiResponse.ApiResponse.ok(msg="注册成功"))
 
 
 class BaseView(View):
