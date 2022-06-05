@@ -278,16 +278,20 @@ class ProjectDetailView(View):
     def get(self, request):
         method = request.GET.get('method')
         if str(method).__eq__('allWithPage'):
+            userId = request.GET.get('user_id')
             page = request.GET.get('page')
             limit = request.GET.get('limit')
             result = self.allWithPage(page, limit)
             project_count = TeamProject.objects.count()
             page_count = project_count / int(request.GET.get('limit'))
             page_count = int(page_count) + 1
+            recommendProject = self.recommendProj(userId)
+            print(recommendProject)
             return render(request, 'web/project_detail.html',
                           {'breadNav': {'志愿项目'}, 'projectInfo': result, 'projectCount': project_count,
                            'pageIndex': int(page),
-                           'pageCount': page_count})
+                           'pageCount': page_count,
+                           'recommend':recommendProject})
         # return render(request, 'web/project_detail.html', {'breadNav': {'志愿项目'}})
 
     def generateProjectInfo(self):
@@ -333,6 +337,25 @@ class ProjectDetailView(View):
         datas = TeamProject.objects.all()
         page_result = Paginator(datas, limit)
         return page_result.page(page)
+
+    def recommendProj(self, userId):
+        print(userId)
+        typeTemp = Volunteer.objects.filter(user_id=userId).first().service_type
+        area = Volunteer.objects.filter(user_id=userId).first().service_area
+        serviceType = typeTemp.replace('[','').replace(']','').split(',')
+        indexStr= ''
+        recommend = []
+        value_temp = TeamProject.objects.filter(project_area=area).filter(service_type__icontains=serviceType[0]) \
+            .filter(service_type__icontains=serviceType[1]) | TeamProject.objects.filter(project_area=area).filter(service_type__icontains=serviceType[1]) \
+            .filter(service_type__icontains=serviceType[1]) | TeamProject.objects.filter(project_area=area).filter(service_type__icontains=serviceType[2]) \
+            .filter(service_type__icontains=serviceType[1]) | TeamProject.objects.filter(project_area=area).filter(service_type__icontains=serviceType[3]) \
+            .filter(service_type__icontains=serviceType[1]).values_list()
+
+        for indic in range(4):
+            random.seed(timezone.now().timestamp())
+            recommend.append(value_temp[random.randrange(0,value_temp.__len__())])
+
+        return recommend
 
 
 class ProjectRealDetailView(View):

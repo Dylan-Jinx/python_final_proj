@@ -154,7 +154,49 @@
         <a class="team-page-btn">跳转</a>
         <span id="teamPageCountInfo">{{ pageIndex }}/{{ pageCount }}页 共{{ projectCount }}条</span>
     </div>
-
+    <div class="row container" id="recommendContainer" style="margin: 0 auto">
+        <div>
+            <h3 style="font-weight: bolder">猜你喜欢的项目</h3>
+        </div>
+         {% for re in recommend %}
+            <div class="col-md-3" style="padding: 15px">
+                <div class="card" style="width: 18rem;">
+                    <input type="hidden" value="{{ re.project_id }}">
+                    {% if re.project_icon is not None %}
+                        <img src="{% static  re.project_icon %}" class="card-img-top" alt="...">
+                    {% else %}
+                        <img src="{% static 'assert/images/1.png' %}" class="card-img-top" alt="...">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ re.project_name }}</h5>
+                        <div class="row">
+                            <div class="col">
+                                <a class="card-text">项目招募人数：{{ re.project_mem }}</a>
+                            </div>
+                            <div class="col text-end">
+                                <a class="card-text">队伍满意度</a>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider" style="border: 1px solid rgb(244,187,191)"></div>
+                    </div>
+                    <div class="card-body row" style="width: 100%">
+                        <div class="col">
+                            <img src="{% static 'assert/images/traning_icon.png' %}" alt="">
+                            <a>培训5.0</a>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'assert/images/smell_icon.png' %}" alt="">
+                            <a>合作5.0</a>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'assert/images/coopration_icon.png' %}" alt="">
+                            <a>计划5.0</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 
     <script type="text/javascript">
@@ -196,6 +238,14 @@
             let projectId = rootElem.children().children('input').val()
             console.log(projectId)
             $(location).attr('href', '../../team/projectdetail?project_id='+projectId)
+        })
+        $('#recommendContainer').on('click','div', function (){
+            let rootElem = $(this)
+            console.log(rootElem)
+            let projectId = rootElem.children().children('input').val()
+            if(projectId !== undefined){
+                $(location).attr('href', '../../team/projectdetail?project_id='+projectId)
+            }
         })
     </script>
 {% endblock userBody %}
