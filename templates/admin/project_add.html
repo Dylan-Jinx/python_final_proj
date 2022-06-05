@@ -1,89 +1,120 @@
 {% extends "admin/index.html" %}
 {% load static %}
 {% block mainbody %}
-<form class="layui-form"> <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
+<div class="layui-form"> <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
   <div class="layui-form-item">
     <label class="layui-form-label">项目名称</label>
     <div class="layui-input-block">
-      <input type="text" name="project_name" placeholder="请输入项目名称" autocomplete="off" class="layui-input">
+      <input type="text" name="project_name" placeholder="请输入项目名称" autocomplete="off" class="layui-input" lay-verify="required">
     </div>
   </div>
   <div class="layui-form-item">
     <label class="layui-form-label">项目介绍</label>
     <div class="layui-input-block">
-      <input type="text" name="project_info" placeholder="请输入项目介绍" autocomplete="off" class="layui-input">
+      <input type="text" name="project_info" placeholder="请输入项目介绍" autocomplete="off" class="layui-input" lay-verify="required">
     </div>
   </div>
   <div class="layui-form-item">
     <label class="layui-form-label">项目联系人</label>
     <div class="layui-input-block">
-      <input type="text" name="project_concact" placeholder="请输入项目联系人" autocomplete="off" class="layui-input">
+      <input type="text" name="project_concact" placeholder="请输入项目联系人" autocomplete="off" class="layui-input" lay-verify="required">
     </div>
   </div>
   <div class="layui-form-item">
     <label class="layui-form-label">联系方式</label>
     <div class="layui-input-block">
-      <input type="text" name="project_concact_phone" placeholder="请输入项目负责人联系方式" autocomplete="off" class="layui-input">
+      <input type="text" name="project_concact_phone" placeholder="请输入项目负责人联系方式" autocomplete="off" class="layui-input" lay-verify="required">
     </div>
   </div>
   <div class="layui-form-item">
-    <label class="layui-form-label">选择显示图标</label>
+    <label class="layui-form-label">志愿时长</label>
     <div class="layui-input-block">
-      <select name="project_icon" id="project_icon" lay-filter="aihao">
-        <option value="assert/images/1.png">写作</option>
-        <option value="assert/images/2.png">写作</option>
-        <option value="assert/images/3.png">写作</option>
-        <option value="assert/images/4.png">写作</option>
-        <option value="assert/images/5.png">写作</option>
+      <input type="text" name="service_hour" placeholder="请输入志愿时长" autocomplete="off" class="layui-input" lay-verify="required">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">选择显示图片</label>
+    <div class="layui-input-block">
+      <select name="project_icon" id="project_icon" lay-filter="aihao" lay-verify="required">
+        <option value="assert/images/1.png">疫情防控</option>
+        <option value="assert/images/2.png">关爱老人</option>
+        <option value="assert/images/3.png">救助援助</option>
+        <option value="assert/images/4.png">通用展示1</option>
+        <option value="assert/images/5.png">通用展示2</option>
       </select>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">成员人数</label>
+    <div class="layui-input-block">
+      <input type="text" name="project_member" placeholder="请输入项目需要人数" autocomplete="off" class="layui-input" lay-verify="required">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">持续天数</label>
+    <div class="layui-input-block">
+      <input type="text" name="day_number" placeholder="请输入项目持续天数" autocomplete="off" class="layui-input" lay-verify="required">
     </div>
   </div>
   <div class="layui-form-item">
     <label class="layui-form-label">复选框</label>
     <div class="layui-input-block">
-      <input type="checkbox" name="like[write]" title="写作">
-      <input type="checkbox" name="like[read]" title="阅读">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">开关关</label>
-    <div class="layui-input-block">
-      <input type="checkbox" lay-skin="switch">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">开关开</label>
-    <div class="layui-input-block">
-      <input type="checkbox" checked lay-skin="switch">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">单选框</label>
-    <div class="layui-input-block">
-      <input type="radio" name="sex" value="0" title="男">
-      <input type="radio" name="sex" value="1" title="女" checked>
-    </div>
-  </div>
-  <div class="layui-form-item layui-form-text">
-    <label class="layui-form-label">请填写描述</label>
-    <div class="layui-input-block">
-      <textarea placeholder="请输入内容" class="layui-textarea"></textarea>
+        {% for type in serviceType %}
+            <input type="checkbox" lay-filter="ckType" id="serviceTypeRange" name='typeName' title={{ type.dict_info }} value={{ type.dict_detail_id }}>
+        {% endfor %}
     </div>
   </div>
   <div class="layui-form-item">
     <div class="layui-input-block">
       <button class="layui-btn" lay-submit lay-filter="*">立即提交</button>
-      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      <button type="reset"  class="layui-btn layui-btn-primary">重置</button>
     </div>
   </div>
   <!-- 更多表单结构排版请移步文档左侧【页面元素-表单】一项阅览 -->
-</form>
+</div>
 <script src="layui.js"></script>
 <script>
 layui.use('form', function(){
   var form = layui.form;
+    console.log(form.val())
+    form.on('checkbox(ckType)', function(data){
+        var len=$("input[name='typeName']:checked").length;
+        console.log(len)
+        if(len>3){
+            $(data.elem).next().attr("class","layui-unselect layui-form-checkbox");
+            $(data.elem).prop("checked",false);
+            layer.msg('最多只能选3项！',{icon:5});
+            return false;
+        }
+        console.log(data.elem); //得到checkbox原始DOM对象
+        console.log(data.elem.checked); //是否被选中，true或者false
+        console.log(data.value); //复选框value值，也可以通过data.elem.value得到
+        console.log(data.othis); //得到美化后的DOM对象
+    });
+    form.on('submit(*)', function(datas){
+        let teamId = $('#team_manage_id').val()
+        var arr = new Array();
+        $("input:checkbox[name='typeName']:checked").each(function(i){
+            arr[i] = $(this).val();
+        });
+        console.log(arr)
+        console.log(teamId)
+        console.log(datas.form) //被执行提交的form对象，一般在存在form标签时才会返回
+        console.log(datas.field) //当前容器的全部表单字段，名值对形式：{name: value}
+        $.ajax({
+            url: "../createProject?method=add&team_id="+teamId+"&service_type="+arr,
+            method: 'GET',
+            data: datas.field,
+            success:function (datas){
+            layer.msg('创建成功！',{icon:1});
+            console.log(datas)
+            }
+        })
+        return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+    });
 
-  //各种基于事件的操作，下面会有进一步介绍
 });
+
+
 </script>
 {% endblock mainbody %}

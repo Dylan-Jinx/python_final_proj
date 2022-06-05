@@ -6,7 +6,7 @@ import threading
 import time
 import uuid
 
-import django.db
+import datetime
 import django.utils.timezone as timezone
 from django.core.paginator import Paginator
 from django.db import connection
@@ -816,5 +816,42 @@ class CreateProjectView(View):
         return result
 
     def get(self, request):
+        if str(request.GET.get('method')).__eq__('add'):
+            self.addProject(request)
+            return JsonResponse(ApiResponse.api_reponse("操作成功",count=0))
+        else:
+            serviceType = DictDetail.objects.filter(dict_code='6b2f6f24a23a4b079ed19b97eab2ce4b')
+            return render(request, "admin/project_add.html", {"serviceType": serviceType})
 
-        return render(request, "admin/project_add.html")
+    def addProject(self, request):
+        datas = json.loads(json.dumps(request.GET))
+        teamId = request.GET.get('team_id')
+        print(teamId)
+        teamArea = VolunteerTeam.objects.filter(team_id=teamId).first().team_area
+        projectName = datas.get('project_name')
+        projectInfo = datas.get('project_info')
+        projectConcact = datas.get('project_concact')
+        projectConcactPhone = datas.get('project_concact_phone')
+        projectIcon = datas.get('project_icon')
+        projectMember = datas.get('project_member')
+        serviceHour = datas.get('service_hour')
+        dayNumber = datas.get('day_number')
+        serviceType = request.GET.get('service_type')
+        start = datetime.datetime.now()
+        end = start + datetime.timedelta(days=int(dayNumber))
+        TeamProject.objects.create(
+            project_id=str(uuid.uuid4()).replace('-', ''),
+            team_id=teamId,
+            project_name=projectName,
+            project_concact=projectConcact,
+            project_concact_phone=projectConcactPhone,
+            project_icon=projectIcon,
+            service_type=serviceType,
+            project_mem=projectMember,
+            start_time=start,
+            end_time=end,
+            project_area=teamArea,
+            service_hour=serviceHour,
+            project_info=projectInfo
+        )
+
