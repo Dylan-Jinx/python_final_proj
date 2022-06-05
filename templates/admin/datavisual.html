@@ -1,0 +1,14 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% block mainbody %}
+
+    <div class="row">
+        <div class="col">
+            {% include "admin/render.html" %}
+        </div>
+        <div class="col">
+            {% include "admin/teamGraph.html" %}
+        </div>
+    </div>
+
+{% endblock %}

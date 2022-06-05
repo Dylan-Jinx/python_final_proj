@@ -1,4 +1,5 @@
 {% extends 'web/base_index.html' %}
+{% load my_tag %}
 {% load static %}
 {% block userBody %}
     <style>
@@ -89,22 +90,21 @@
         }
 
     </style>
-
     <div class="row container" id="teamContainer" style="margin: -120px auto 0;">
-        {% for team in teamInfo %}
+        {% for project in projectInfo %}
             <div class="col-md-3" style="padding: 15px">
                 <div class="card" style="width: 18rem;">
-                    <input type="hidden" value="{{ team.team_id }}">
-                    {% if team.team_icon is not None %}
-                        <img src="{{ team.team_icon }}" class="card-img-top" alt="...">
+                    <input type="hidden" value="{{ project.project_id }}">
+                    {% if project.project_icon is not None %}
+                        <img src="{% static  project.project_icon %}" class="card-img-top" alt="...">
                     {% else %}
-                        <img src="{% static 'assert/images/fj_new_logo.webp' %}" class="card-img-top" alt="...">
+                        <img src="{% static 'assert/images/1.png' %}" class="card-img-top" alt="...">
                     {% endif %}
                     <div class="card-body">
-                        <h5 class="card-title">{{ team.team_name }}</h5>
+                        <h5 class="card-title">{{ project.project_name }}</h5>
                         <div class="row">
                             <div class="col">
-                                <a class="card-text">队伍人数：5</a>
+                                <a class="card-text">项目招募人数：{{ project.project_mem }}</a>
                             </div>
                             <div class="col text-end">
                                 <a class="card-text">队伍满意度</a>
@@ -152,7 +152,7 @@
         <input type="text" id="page-input" value="{{ pageIndex }}">
         <span>页</span>
         <a class="team-page-btn">跳转</a>
-        <span id="teamPageCountInfo">{{ pageIndex }}/{{ pageCount }}页 共{{ teamCount }}条</span>
+        <span id="teamPageCountInfo">{{ pageIndex }}/{{ pageCount }}页 共{{ projectCount }}条</span>
     </div>
 
 
@@ -182,19 +182,19 @@
                 let lastPageIndex = pageInfo.toString().substr(startIndex + 1, 2)
                 let findIndex = $('#page-input').val()
                 if (findIndex <= lastPageIndex){
-                    $(location).attr('href', '../team?method=allWithPage&page=' + findIndex + '&limit=16')
+                    $(location).attr('href', '../../team/project?method=allWithPage&page=' + findIndex + '&limit=16')
                 }else {
-                    $(location).attr('href', '../team?method=allWithPage&page=' + lastPageIndex + '&limit=16')
+                    $(location).attr('href', '../../team/project?method=allWithPage&page=' + lastPageIndex + '&limit=16')
                 }
             }else {
-                $(location).attr('href', '../team?method=allWithPage&page=' + catchIndex + '&limit=16')
+                $(location).attr('href', '../../team/project?method=allWithPage&page=' + catchIndex + '&limit=16')
             }
         })
         {# 点击按钮到队伍详细信息 #}
         $('#teamContainer').on('click','div', function (){
             let rootElem = $(this)
-            let teamId = rootElem.children().children('input').val()
-            $(location).attr('href', '/user/team/detail?team_id='+teamId)
+            let projectId = rootElem.children().children('input').val()
+            $(location).attr('href', '../../team/projectdetail?projectId='+projectId)
             console.log(teamId)
         })
     </script>

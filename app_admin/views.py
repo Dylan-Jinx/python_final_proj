@@ -15,6 +15,9 @@ from django.http import JsonResponse, QueryDict
 from django.shortcuts import *
 from django.template.response import *
 from django.views import View
+from pyecharts.charts import *
+from django.db.models import Avg, Max, Min, Count, Sum
+from pyecharts import options as opts
 
 import app_web.models
 from app_admin.models import *
@@ -411,6 +414,7 @@ class VolunteerTeamCheckView(View):
         print(datas.query)
         return ApiResponse.ok('获取成功', datas, 0)
 
+
 class TeamManageView(View):
     def dispatch(self, request, *args, **kwargs):
         result = super(TeamManageView, self).dispatch(request, *args, **kwargs)
@@ -455,7 +459,6 @@ class TeamManageView(View):
         except Exception as e:
             print(e)
             return False
-
 
 
 # 数据字典
@@ -663,3 +666,72 @@ class ThreeLevelProvinceAndCityAndAreaLinker(View):
             area_name = ''
         result = province_name + city_name + area_name
         return {"result": result}
+
+
+# 数据可视化
+class DataVisual(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(DataVisual, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        bar = Bar()
+        # pie = Pie("各地区志愿者人数统计")
+
+        
+        self.renderVolunteerGraph()
+        self.renderTeamGraph()
+        # bar.add_xaxis(x_volunteer_val)
+        # bar.add_yaxis("数量", y_volunteer_val)
+        # bar.render("templates/admin/render.html")
+        # pie.render("templates/admin/render.html")
+
+        return render(request, "admin/datavisual.html", )
+
+    def renderVolunteerGraph(self):
+        x_volunteer_val = []
+        y_volunteer_val = []
+        c = Pie()
+
+        volunteer_num = Volunteer.objects.values("hometown").annotate(c=Count("nick_name")).values("hometown",
+                                                                                                   "c").order_by("-c")
+        visualCount = 1
+        print(volunteer_num.query)
+        for temp in volunteer_num:
+            visualCount += 1
+            if dict(temp).get('hometown') is not None:
+                hometownCode = dict(temp).get('hometown')
+                x_volunteer_val.append(Area.objects.filter(code=hometownCode).first().name)
+                y_volunteer_val.append(dict(temp).get('c'))
+            if visualCount > 10:
+                break
+        c.add("", [list(z) for z in zip(x_volunteer_val, y_volunteer_val)], radius=["40%", "75%"])
+        # 圆环的粗细和大小
+        c.set_global_opts(title_opts=opts.TitleOpts(title="志愿者人数排名前10区域"),
+                          legend_opts=opts.LegendOpts(orient="vertical", pos_top="5%", pos_left="2%"))
+        c.set_series_opts(label_opts=opts.LabelOpts(formatter="{b}:{c}"))
+        c.render("templates/admin/render.html")
+
+    def renderTeamGraph(self):
+        x_volunteer_val = []
+        y_volunteer_val = []
+        c = Pie()
+
+        volunteer_num = VolunteerTeam.objects.values("team_area").annotate(c=Count("team_name")).values("team_area",
+                                                                                                   "c").order_by("-c")
+        visualCount = 1
+        print(volunteer_num.query)
+        for temp in volunteer_num:
+            visualCount += 1
+            if dict(temp).get('team_area') is not None:
+                hometownCode = dict(temp).get('team_area')
+                x_volunteer_val.append(Area.objects.filter(code=hometownCode).first().name)
+                y_volunteer_val.append(dict(temp).get('c'))
+            if visualCount > 10:
+                break
+        c.add("", [list(z) for z in zip(x_volunteer_val, y_volunteer_val)], radius=["40%", "75%"])
+        # 圆环的粗细和大小
+        c.set_global_opts(title_opts=opts.TitleOpts(title="志愿队伍数排名前10区域"),
+                          legend_opts=opts.LegendOpts(orient="vertical", pos_top="5%", pos_left="2%"))
+        c.set_series_opts(label_opts=opts.LabelOpts(formatter="{b}:{c}"))
+        c.render("templates/admin/teamGraph.html")

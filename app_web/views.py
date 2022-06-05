@@ -1,6 +1,7 @@
 import hashlib
+import random
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.paginator import Paginator
 from django.db.models import QuerySet
@@ -267,3 +268,79 @@ class UserDetailView(View):
         return render(request, 'web/user_detail.html',
                       {'breadNav': {'用户信息'}, 'volunteer': datas, 'team_count': teamCount,
                        'comment_count': commentCount})
+
+
+class ProjectDetailView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(ProjectDetailView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        method = request.GET.get('method')
+        if str(method).__eq__('allWithPage'):
+            page = request.GET.get('page')
+            limit = request.GET.get('limit')
+            result = self.allWithPage(page, limit)
+            project_count = TeamProject.objects.count()
+            page_count = project_count / int(request.GET.get('limit'))
+            page_count = int(page_count) + 1
+            return render(request, 'web/project_detail.html',
+                          {'breadNav': {'志愿项目'}, 'projectInfo': result, 'projectCount': project_count, 'pageIndex': int(page),
+                           'pageCount': page_count})
+        # return render(request, 'web/project_detail.html', {'breadNav': {'志愿项目'}})
+
+    def generateProjectInfo(self):
+        projectId = str(uuid.uuid4()).replace("-", "")
+        volunteer_team_datas = VolunteerTeam.objects.all().values()
+
+        pre_project_name = ['疫情防控', '科技支教', '划龙舟赛场维护', '高考爱心助考', '环境保护清扫垃圾', '交通秩序维护', '防溺水宣讲']
+        img_project_name = ["assert/images/1.png","assert/images/2.png","assert/images/3.png","assert/images/4.png","assert/images/5.png"]
+
+        start = datetime.now()
+        end = start + timedelta(days=random.randrange(7,30))
+
+        xx_count = 0
+        for i in range(5):
+            for temp in volunteer_team_datas:
+                service_t = []
+                list = [i for i in range(20)]
+                for i in range(3):
+                    service_t.append(list.pop(random.randrange(0, 20 - i)))
+                random.seed(timezone.now().timestamp())
+                project_info = dict(temp)
+                TeamProject.objects.create(
+                    project_id=str(uuid.uuid4()).replace('-', ''),
+                    team_id=project_info.get('team_id'),
+                    project_name=project_info.get('team_name')[0:3]+pre_project_name[random.randrange(0,7)]+"志愿活动",
+                    project_concact=project_info.get('team_concact'),
+                    project_concact_phone=project_info.get('team_concact_phone'),
+                    project_icon=img_project_name[random.randrange(0,5)],
+                    service_type=service_t,
+                    project_mem=random.randrange(10,300),
+                    start_time=start,
+                    end_time=end,
+                    project_area=project_info.get('team_area'),
+                    check_status=random.randrange(0,1),
+                    remove_flag=random.randrange(0,1),
+                    service_hour=random.randrange(2,72),
+                )
+                xx_count += 1
+                print(f"已完成数据生成数：{xx_count}")
+
+    def allWithPage(self, page, limit):
+        datas = TeamProject.objects.all()
+        page_result = Paginator(datas, limit)
+        return page_result.page(page)
+
+class ProjectRealDetailView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(ProjectRealDetailView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        return render(request, "web/project_real_detail.html",{'breadNav': {'志愿项目','志愿项目详细'}})
+
+
+
+
+
