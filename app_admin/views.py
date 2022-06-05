@@ -776,3 +776,45 @@ class DataVisual(View):
         line2.add_yaxis("平均志愿时长最少的10个地区", y_volunteer_time_low_val)
         line.render("templates/admin/timeGraph.html")
         line2.render("templates/admin/timeLowGraph.html")
+
+
+class ProjectInfoView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(ProjectInfoView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        if str(request.GET.get('method')).__eq__('getAllInfo'):
+            result = self.get_all_project_page(request)
+            return JsonResponse(result)
+        elif str(request.GET.get('method')).__eq__('deleteProject'):
+            result = self.delete_team_project(request)
+            return JsonResponse(result)
+        return render(request, "admin/teamprojectinfo.html")
+
+
+    def get_all_project_page(self, request):
+        try:
+            teamId = request.GET.get('team_id')
+            page = request.GET.get("page")
+            limit = request.GET.get("limit")
+            datas = TeamProject.objects.filter(team_id=teamId)
+            page_result = Paginator(datas, limit)
+            return ApiResponse.ok('获取成功', page_result.page(number=page), page_result.count)
+        except Exception as e:
+            print(e)
+
+    def delete_team_project(self, request):
+        projectId = request.GET.get('project_id')
+        TeamProject.objects.filter(project_id=projectId).delete()
+        return ApiResponse.api_reponse('操作成功')
+
+
+class CreateProjectView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(CreateProjectView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+
+        return render(request, "admin/project_add.html")

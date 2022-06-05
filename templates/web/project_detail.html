@@ -194,8 +194,8 @@
         $('#teamContainer').on('click','div', function (){
             let rootElem = $(this)
             let projectId = rootElem.children().children('input').val()
-            $(location).attr('href', '../../team/projectdetail?projectId='+projectId)
-            console.log(teamId)
+            console.log(projectId)
+            $(location).attr('href', '../../team/projectdetail?project_id='+projectId)
         })
     </script>
 {% endblock userBody %}

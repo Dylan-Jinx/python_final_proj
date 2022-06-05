@@ -285,7 +285,8 @@ class ProjectDetailView(View):
             page_count = project_count / int(request.GET.get('limit'))
             page_count = int(page_count) + 1
             return render(request, 'web/project_detail.html',
-                          {'breadNav': {'志愿项目'}, 'projectInfo': result, 'projectCount': project_count, 'pageIndex': int(page),
+                          {'breadNav': {'志愿项目'}, 'projectInfo': result, 'projectCount': project_count,
+                           'pageIndex': int(page),
                            'pageCount': page_count})
         # return render(request, 'web/project_detail.html', {'breadNav': {'志愿项目'}})
 
@@ -294,10 +295,11 @@ class ProjectDetailView(View):
         volunteer_team_datas = VolunteerTeam.objects.all().values()
 
         pre_project_name = ['疫情防控', '科技支教', '划龙舟赛场维护', '高考爱心助考', '环境保护清扫垃圾', '交通秩序维护', '防溺水宣讲']
-        img_project_name = ["assert/images/1.png","assert/images/2.png","assert/images/3.png","assert/images/4.png","assert/images/5.png"]
+        img_project_name = ["assert/images/1.png", "assert/images/2.png", "assert/images/3.png", "assert/images/4.png",
+                            "assert/images/5.png"]
 
         start = datetime.now()
-        end = start + timedelta(days=random.randrange(7,30))
+        end = start + timedelta(days=random.randrange(7, 30))
 
         xx_count = 0
         for i in range(5):
@@ -311,18 +313,18 @@ class ProjectDetailView(View):
                 TeamProject.objects.create(
                     project_id=str(uuid.uuid4()).replace('-', ''),
                     team_id=project_info.get('team_id'),
-                    project_name=project_info.get('team_name')[0:3]+pre_project_name[random.randrange(0,7)]+"志愿活动",
+                    project_name=project_info.get('team_name')[0:3] + pre_project_name[random.randrange(0, 7)] + "志愿活动",
                     project_concact=project_info.get('team_concact'),
                     project_concact_phone=project_info.get('team_concact_phone'),
-                    project_icon=img_project_name[random.randrange(0,5)],
+                    project_icon=img_project_name[random.randrange(0, 5)],
                     service_type=service_t,
-                    project_mem=random.randrange(10,300),
+                    project_mem=random.randrange(10, 300),
                     start_time=start,
                     end_time=end,
                     project_area=project_info.get('team_area'),
-                    check_status=random.randrange(0,1),
-                    remove_flag=random.randrange(0,1),
-                    service_hour=random.randrange(2,72),
+                    check_status=random.randrange(0, 1),
+                    remove_flag=random.randrange(0, 1),
+                    service_hour=random.randrange(2, 72),
                 )
                 xx_count += 1
                 print(f"已完成数据生成数：{xx_count}")
@@ -332,15 +334,57 @@ class ProjectDetailView(View):
         page_result = Paginator(datas, limit)
         return page_result.page(page)
 
+
 class ProjectRealDetailView(View):
     def dispatch(self, request, *args, **kwargs):
         result = super(ProjectRealDetailView, self).dispatch(request, *args, **kwargs)
         return result
 
     def get(self, request):
-        return render(request, "web/project_real_detail.html",{'breadNav': {'志愿项目','志愿项目详细'}})
+        try:
+            projectId = request.GET.get('project_id')
+            userId = request.session['user_id']
+            commentInfo = VolunteerComment.objects.filter(project_id=projectId)
+            data = TeamProject.objects.filter(project_id=projectId)
+            if userId is not None:
+                joinStatus = ProjectJoin.objects.filter(project_id=projectId, user_id=userId).count()
+                if joinStatus > 0:
+                    return render(request, 'web/project_real_detail.html',
+                                  {'breadNav': {'志愿项目', '项目详细'}, 'projectInfo': data, 'joinStatus': False,
+                                   'comments': commentInfo})
+                else:
+                    return render(request, 'web/project_real_detail.html',
+                                  {'breadNav': {'志愿项目', '项目详细'}, 'projectInfo': data, 'joinStatus': True,
+                                   'comments': commentInfo})
+        except Exception as e:
+            return render(request, 'web/project_real_detail.html',
+                          {'breadNav': {'志愿项目', '项目详细'}, 'projectInfo': data, 'joinStatus': False})
+
+        return render(request, "web/project_real_detail.html", {'breadNav': {'志愿项目', '项目详细'}})
 
 
+class JoinProjectView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(JoinProjectView, self).dispatch(request, *args, **kwargs)
+        return result
+    
+    def post(self, request):
+        datas = json.loads(json.dumps(request.POST))
+        if str(datas.get('method')).__eq__('applyProject'):
+            if self.applyProject(datas):
+                return JsonResponse(ApiResponse.ApiResponse.ok_simple('提交申请成功'))
+            else:
+                return JsonResponse(ApiResponse.ApiResponse.ok_simple('已经是该项目的成员了'))
 
-
-
+    def applyProject(self, datas) -> bool:
+        projectId = datas.get('project_id')
+        userId = datas.get('user_id')
+        serviceHour = datas.get('hour')
+        datas = ProjectJoin.objects.filter(project_id=projectId, user_id=userId)
+        if datas.count() == 0:
+            ProjectJoin.objects.create(
+                user_id=userId,
+                project_id=projectId,
+                hour=serviceHour,
+                join_time=timezone.now()
+            )

@@ -32,6 +32,8 @@ urlpatterns = [
     path('dict/', admin.DataDict.as_view()),
     path('manageteam/', admin.TeamManageView.as_view()),
     path('datavisual/', admin.DataVisual.as_view()),
+    path('projectinfo/', admin.ProjectInfoView.as_view()),
+    path('createProject/', admin.CreateProjectView.as_view()),
 
 
     path('index/', web.AppIndex.as_view()),
@@ -45,7 +47,8 @@ urlpatterns = [
     path('user/register/', web.RegisterView.as_view()),
     path('team/register/', web.TeamRegisterView.as_view()),
     path('team/project/', web.ProjectDetailView.as_view()),
-    path('team/projectdetail', web.ProjectRealDetailView.as_view()),
+    path('team/projectdetail/', web.ProjectRealDetailView.as_view()),
+    path('team/joinproject/', web.JoinProjectView.as_view()),
 
     path('base/', web.BaseView.as_view()),
 
