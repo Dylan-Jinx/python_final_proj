@@ -51,11 +51,10 @@ class LoginView(View):
         pwd_data = request.POST.get("password")
         encode_pwd = hashlib.md5(pwd_data.encode(encoding='UTF-8')).hexdigest()
         print(f"{phone_data} {pwd_data}")
-        volunteer = Volunteer.objects.filter(phone=phone_data, pwd=encode_pwd).first()
-        print(volunteer)
-        if volunteer is not None:
-            request.session["user_id"] = volunteer.user_id
-            request.session["nick_name"] = volunteer.nick_name
+        team = VolunteerTeam.objects.filter(team_login_name=phone_data, team_pwd=encode_pwd).first()
+        if team is not None:
+            request.session["team_id"] = team.team_id
+            request.session["nick_name"] = team.team_name
             return HttpResponseRedirect("/admin/index/")
         else:
             return render(request, "admin/login.html", {"loginTip": "用户名或密码输入错误"})
@@ -423,6 +422,7 @@ class TeamManageView(View):
     def get(self, request):
         if str(request.GET.get('method')).__eq__('getAllInfo'):
             result = self.get_all_team_member(request)
+            print(result)
             return JsonResponse(result)
         return render(request, 'admin/teammemberapply.html')
 
@@ -437,6 +437,7 @@ class TeamManageView(View):
 
     def get_all_team_member(self, request):
         removeFlag = request.GET.get('remove_flag')
+        teamId = request.GET.get('team_id')
         page = request.GET.get("page")
         limit = request.GET.get("limit")
         datas = TeamMember.objects.filter(remove_flag=removeFlag).all()
@@ -444,9 +445,9 @@ class TeamManageView(View):
 
         sql = "SELECT volunteer.user_name,volunteer.phone,volunteer.phone,volunteer.user_mail,volunteer.service_area,volunteer_team.team_name,join_time,team_member.team_id,team_member.user_id" \
               " FROM volunteer,volunteer_team,team_member " \
-              "WHERE volunteer.user_id = %s AND volunteer_team.team_id = %s AND team_member.remove_flag = %s"
-        result = query_result_convert.origin_db_query(sql)
-        print(result)
+              "WHERE  team_member.remove_flag = %s"
+
+        result = query_result_convert.origin_db_query(sql, [teamId, removeFlag])
         return ApiResponse.ok_simple(data=result, count=result.__len__())
 
     def applyStatus(self, datas):
@@ -675,16 +676,10 @@ class DataVisual(View):
         return result
 
     def get(self, request):
-        bar = Bar()
-        # pie = Pie("各地区志愿者人数统计")
+        self.areaVolunTimeGraph()
 
-        
-        self.renderVolunteerGraph()
-        self.renderTeamGraph()
-        # bar.add_xaxis(x_volunteer_val)
-        # bar.add_yaxis("数量", y_volunteer_val)
-        # bar.render("templates/admin/render.html")
-        # pie.render("templates/admin/render.html")
+        # self.renderVolunteerGraph()
+        # self.renderTeamGraph()
 
         return render(request, "admin/datavisual.html", )
 
@@ -718,7 +713,8 @@ class DataVisual(View):
         c = Pie()
 
         volunteer_num = VolunteerTeam.objects.values("team_area").annotate(c=Count("team_name")).values("team_area",
-                                                                                                   "c").order_by("-c")
+                                                                                                        "c").order_by(
+            "-c")
         visualCount = 1
         print(volunteer_num.query)
         for temp in volunteer_num:
@@ -735,3 +731,48 @@ class DataVisual(View):
                           legend_opts=opts.LegendOpts(orient="vertical", pos_top="5%", pos_left="2%"))
         c.set_series_opts(label_opts=opts.LabelOpts(formatter="{b}:{c}"))
         c.render("templates/admin/teamGraph.html")
+
+    def areaVolunTimeGraph(self):
+        line = Line()
+        line2 = Line()
+        # pie = Pie("各地区志愿者人数统计")
+
+        x_volunteer_time_val = []
+        y_volunteer_time_val = []
+        x_volunteer_time_low_val = []
+        y_volunteer_time_low_val = []
+        volunteer_vol_times = Volunteer.objects.values("hometown").annotate(c=Avg("train_time")).values("hometown",
+                                                                                                        "c").order_by(
+            "-c")
+        volunteer_vol_low_times = Volunteer.objects.values("hometown").annotate(c=Avg("train_time")).values("hometown",
+                                                                                                            "c").order_by(
+            "c")
+        visualCount = 0
+        visualCountLow = 0
+        for temp in volunteer_vol_times:
+            visualCount += 1
+
+            if dict(temp).get('hometown') is not None:
+                hometownCode = dict(temp).get('hometown')
+                x_volunteer_time_val.append(Area.objects.filter(code=hometownCode).first().name)
+                y_volunteer_time_val.append(dict(temp).get('c'))
+                if visualCount > 10:
+                    break
+
+        for temp1 in volunteer_vol_low_times:
+            visualCountLow += 1
+            if dict(temp1).get('hometown') is not None:
+                hometownCode = dict(temp1).get('hometown')
+                if Area.objects.filter(code=hometownCode).first().name == '市辖区':
+                    continue
+                x_volunteer_time_low_val.append(Area.objects.filter(code=hometownCode).first().name)
+                y_volunteer_time_low_val.append(dict(temp1).get('c'))
+                if visualCountLow > 10:
+                    break
+
+        line.add_xaxis(x_volunteer_time_val)
+        line2.add_xaxis(x_volunteer_time_low_val)
+        line.add_yaxis("平均志愿时长最多的10个地区", y_volunteer_time_val)
+        line2.add_yaxis("平均志愿时长最少的10个地区", y_volunteer_time_low_val)
+        line.render("templates/admin/timeGraph.html")
+        line2.render("templates/admin/timeLowGraph.html")

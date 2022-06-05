@@ -3,11 +3,17 @@
 {% block mainbody %}
 
     <div class="row">
-        <div class="col">
+        <div class="col-6">
             {% include "admin/render.html" %}
         </div>
-        <div class="col">
+        <div class="col-6">
             {% include "admin/teamGraph.html" %}
+        </div>
+        <div class="col-6">
+            {% include "admin/timeGraph.html" %}
+        </div>
+        <div class="col-6">
+            {% include "admin/timeLowGraph.html" %}
         </div>
     </div>
 

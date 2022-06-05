@@ -118,10 +118,12 @@
     {#  渲染数据表格以及操作  #}
     <script type="text/javascript">
         let data;
+        let teamId = $('#team_manage_id').val()
+        print(teamId)
         let mainTable = layui.table;
         mainTable.render({
             elem: '#voluteer_team_table',
-            url: '../team?method=getAllInfo&remove_flag=0',
+            url: '../team?method=getAllInfo&remove_flag=0&team_id='+teamId,
             page: true,
             text: '查询不到数据',
             loading: true,
