@@ -5,14 +5,17 @@
     {#  显示数据表格  #}
     <div class="layui-row layui-card">
         <div class="layui-card">
-            <table id="volunteer_team_check_table" lay-filter="teamApplyTable"/>
+            <table id="team_member_apply_table" lay-filter="teamApplyTable"/>
         </div>
     </div>
 
     <script type="text/html" id="mainTableRowTool">
         <div class="layui-btn-container">
+            <button type="button" id="applySuccess" class="layui-btn layui-btn-sm layui-bg-green"
+                    lay-event="memberApplySuccess">通过申请
+            </button>
             <button type="button" id="appplyFail" class="layui-btn layui-btn-sm layui-bg-red"
-                    lay-event="memberApplyFail" data-bs-toggle="modal" data-bs-target="#memberApplyModal">移除队伍
+                    lay-event="memberApplyFail" data-bs-toggle="modal" data-bs-target="#memberApplyModal">驳回申请
             </button>
         </div>
     </script>
@@ -24,8 +27,8 @@
         let teamId = $('#team_manage_id').val()
         console.log(teamId)
         mainTable.render({
-            elem: '#volunteer_team_check_table',
-            url: '../manageteam?method=getAllInfo&remove_flag=1&team_id='+teamId,
+            elem: '#team_member_apply_table',
+            url: '../projectMemCheck?method=getAllInfo&remove_flag=0&team_id='+teamId,
             page: true,
             text: '查询不到数据',
             loading: true,
@@ -37,69 +40,33 @@
                 {checkbox: true, type: 'checkbox', fixed: 'left', event: 'selected'},
                 {field: 'user_id', title: '用户id', sort: true, fixed: 'left', hide: true},
                 {field: 'team_id', title: '队伍id', sort: true, fixed: 'left', hide: true},
+                {field: 'project_id', title: '项目id', sort: true, fixed: 'left', hide: false},
+                {field: 'project_name', title: '项目名称', sort: true, fixed: 'left', hide: false},
                 {field: 'user_name', title: '姓名', sort: true, fixed: 'left', width: 100},
                 {field: 'phone', title: '联系电话', sort: true, fixed: 'left', width: 120},
                 {field: 'user_mail', title: '邮箱', sort: true, fixed: 'left', width: 170},
-                {
-                    field: 'service_area', title: '服务区域', sort: true, fixed: 'left', templet: function (obj) {
-                        let serviceArea = obj.service_area;
-                        let result;
-                        $.ajax({
-                            url: '../regioncode?method=getAreaAllNameByCode&area_code=' + serviceArea,
-                            method: 'GET',
-                            async: false,
-                            dataType: "json"
-                        }).done(function (datas) {
-                            result = datas.result;
-                        })
-                        if (result == undefined) {
-                            result = "";
-                        }
-                        return result;
-                    }
-                },
-                {field: 'team_name', title: '申请的队伍', sort: true, fixed: 'left'},
-                {
-                    field: 'join_time',
-                    title: '提交申请时间',
-                    sort: true,
-                    width: 140,
-                    fixed: 'left',
-                    templet: function (obj) {
-                        return convertTimeWithTType(obj.join_time)
-                    }
-                },
                 {field: 'right', title: '操作', align: 'center', toolbar: '#mainTableRowTool'},
             ]]
         })
 
-        function memberApplySuccess(userId, flag) {
+        {# 每行工具栏的触发事件 #}
+
+        function memberApplySuccess(userId, flag, projectId) {
             $.ajax({
-                url: '../manageteam/',
+                url: '../projectMemCheck/',
                 method: 'POST',
                 data: {
                     "user_id": userId,
                     "remove_flag": flag,
+                    "project_id": projectId,
                     "method": "applyStatus"
                 },
                 dataType: "json",
                 success: function (data) {
                     layer.msg('操作成功', {time: 2000, anim: 5, icon: 1});
-                    teamApplyReload();
+                    mainTableReloadAllDatas();
                 }
             })
-        }
-
-        {# 每行工具栏的触发事件 #}
-
-        function teamApplyReload() {
-            mainTable.reload('volunteer_team_check_table', {
-                url: '../manageteam?method=getAllInfo',
-                page: {
-                    curr: 1
-                },
-                where: {}
-            }, true)
         }
 
         mainTable.on('tool(teamApplyTable)', function (obj) {
@@ -107,27 +74,36 @@
             let rowData = obj.data;
             let teamId = rowData.team_id;
             let userId = rowData.user_id;
+            let projectId = rowData.project_id;
             console.log(layEvent);
             console.log(rowData);
             console.log(teamId);
             console.log(userId);
             switch (layEvent) {
-                case "memberApplyFail":
-                    layer.confirm('你确定要将' + rowData.user_name + '移除本队伍吗？', {
+                case "memberApplySuccess":
+                    layer.confirm('你确定要通过' + rowData.user_name + '的申请吗？', {
                         icon: 3,
                         btn: ['确定', '取消']
                     }, function (index) {
                         layer.close(index)
-                        memberApplySuccess(userId, 2)
+                        memberApplySuccess(userId, 1, projectId)
+                    })
+                    break;
+                case "memberApplyFail":
+                    layer.confirm('你确定要驳回' + rowData.user_name + '的申请吗？', {
+                        icon: 3,
+                        btn: ['确定', '取消']
+                    }, function (index) {
+                        layer.close(index)
+                        memberApplySuccess(userId, 2, projectId)
                     })
                     break;
             }
         })
 
-
         function mainTableReloadAllDatas() {
             mainTable.reload('team_member_apply_table', {
-                url: '../manageteam?method=getAllInfo&remove_flag=0',
+                url: '../manageteam?method=getAllInfo&team_id=' + $('#team_manage_id').val(),
                 page: {
                     curr: 1
                 },

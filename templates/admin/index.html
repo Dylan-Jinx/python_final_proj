@@ -82,31 +82,31 @@
 </div>
 {# 队伍审核驳回模态框 #}
 <div class="modal fade" id="teamCheckModal" tabindex="-1" aria-labelledby="teamCheckModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="teamCheckModalLabel">驳回申请理由</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <input type="hidden" id="applyFailId">
-          <div class="mb-3">
-              <div id="showTeamCheckFailInfo">
-              </div>
-          </div>
-          <div class="mb-3">
-            <label for="message-text" class="col-form-label">驳回理由:</label>
-            <textarea class="form-control" id="failTip" style="height: 200px"></textarea>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" onclick="applyFail()">驳回</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-      </div>
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="teamCheckModalLabel">驳回申请理由</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="applyFailId">
+                    <div class="mb-3">
+                        <div id="showTeamCheckFailInfo">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">驳回理由:</label>
+                        <textarea class="form-control" id="failTip" style="height: 200px"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="applyFail()">驳回</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <input type="hidden" id="team_manage_id" value={{ request.session.team_id }}>
 <div class="layui-layout layui-layout-admin">
@@ -120,7 +120,6 @@
             </li>
 
             <li class="layui-nav-item layui-hide-xs"><a href="/volunteer">志愿者信息</a></li>
-{#            <li class="layui-nav-item layui-hide-xs"><a href="/team">志愿团体信息</a></li>#}
             <li class="layui-nav-item layui-hide-xs"><a href="/team">志愿团体信息</a></li>
             <li class="layui-nav-item layui-hide-xs"><a href="">志愿项目信息</a></li>
         </ul>
@@ -152,33 +151,47 @@
                     <a class="" href="javascript:;">志愿者</a>
                     <dl class="layui-nav-child proj-nav-indic">
                         <dd><a href="/volunteer">志愿者信息</a></dd>
-                        <dd><a href="javascript:;">评分等级</a></dd>
+                        {#                        <dd><a href="javascript:;">评分等级</a></dd>#}
                     </dl>
                 </li>
-                <li class="layui-nav-item">
-                    <a href="javascript:;">志愿团体</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="/team">团体信息</a></dd>
-                        <dd><a href="/teamcheck">团体审核</a></dd>
-                        <dd><a href="javascript:;">团体评分</a></dd>
-                    </dl>
-                </li>
+
+                {% if request.session.super_flag %}
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">志愿团体</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="/team">团体信息</a></dd>
+                            <dd><a href="/teamcheck">团体审核</a></dd>
+                            {#                        <dd><a href="javascript:;">团体评分</a></dd>#}
+                        </dl>
+                    </li>
+                {% endif %}
                 <li class="layui-nav-item">
                     <a href="javascript:;">志愿项目</a>
                     <dl class="layui-nav-child">
                         <dd><a href="/createProject">创建项目</a></dd>
-                        <dd><a href="/projectinfo">项目信息</a></dd>
-                        <dd><a href="javascript:;">团体评分</a></dd>
+
+                        {% if request.session.super_flag %}
+                            <dd><a href="/projectinfo">项目信息</a></dd>
+                        {% endif %}
+                        {#                        <dd><a href="javascript:;">团体评分</a></dd>#}
                     </dl>
                 </li>
                 <li class="layui-nav-item">
                     <a href="javascript:;">队伍管理</a>
                     <dl class="layui-nav-child">
+                        <dd><a href="/showTeamMem">队伍志愿者</a></dd>
+                    </dl>
+                    <dl class="layui-nav-child">
                         <dd><a href="/manageteam">成员审批</a></dd>
                     </dl>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/projectMemCheck">项目成员审批</a></dd>
+                    </dl>
                 </li>
-                <li class="layui-nav-item"><a href="/dict">数据字典</a></li>
-                <li class="layui-nav-item"><a href="/datavisual">数据可视化</a></li>
+                {% if request.session.super_flag %}
+                    <li class="layui-nav-item"><a href="/dict">数据字典</a></li>
+                    <li class="layui-nav-item"><a href="/datavisual">数据可视化</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

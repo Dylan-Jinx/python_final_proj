@@ -52,10 +52,15 @@ class LoginView(View):
         encode_pwd = hashlib.md5(pwd_data.encode(encoding='UTF-8')).hexdigest()
         print(f"{phone_data} {pwd_data}")
         team = VolunteerTeam.objects.filter(team_login_name=phone_data, team_pwd=encode_pwd).first()
-        if team is not None:
+        if str(phone_data).__eq__('13850526746') and str(pwd_data).__eq__('123456'):
+            request.session["team_name"] = '超级管理员'
+            request.session["super_flag"] = True
+            return render(request, "admin/index.html")
+        elif team is not None:
             request.session["team_id"] = team.team_id
             request.session["team_name"] = team.team_name
-            return HttpResponseRedirect("/admin/index/")
+            request.session["super_flag"] = False
+            return render(request, "admin/index.html")
         else:
             return render(request, "admin/login.html", {"loginTip": "用户名或密码输入错误"})
 
@@ -63,8 +68,8 @@ class LoginView(View):
 class LogOutView(View):
     def get(self, request):
         try:
-            del request.session["user_id"]
-            del request.session["nick_name"]
+            del request.session["team_id"]
+            del request.session["team_name"]
             return HttpResponseRedirect("/admin/login")
         except Exception as e:
             print(e)
@@ -862,5 +867,54 @@ class ShowYourTeamMem(View):
         return result
 
     def get(self, request):
-
         return render(request, "admin/showYourTeamMem.html")
+
+
+class ProjectMemCheckView(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(ProjectMemCheckView, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+        if str(request.GET.get('method')).__eq__('getAllInfo'):
+            result = self.get_all_team_member(request)
+            print(result)
+            return JsonResponse(result)
+        return render(request, 'admin/projectmemcheck.html')
+
+    def post(self, request):
+        datas = json.loads(json.dumps(request.POST))
+        if str(datas.get('method')).__eq__('applyStatus'):
+            result = self.applyStatus(datas)
+            if result:
+                return JsonResponse(ApiResponse.ok('操作成功'))
+            else:
+                return JsonResponse(ApiResponse.ok('操作失败'))
+
+    def get_all_team_member(self, request):
+        removeFlag = request.GET.get('remove_flag')
+        teamId = request.GET.get('team_id')
+        page = request.GET.get("page")
+        limit = request.GET.get("limit")
+
+
+
+        sql = "SELECT volunteer.user_id,team_project.team_id,team_project.project_id,volunteer.user_name,volunteer.phone,volunteer.user_mail,team_project.project_name FROM volunteer,team_project,project_join " \
+              "WHERE team_project.project_id = project_join.project_id AND volunteer.user_id = project_join.user_id " \
+              "AND project_join.project_id in (SELECT team_project.project_id FROM team_project WHERE team_project.team_id = %s) " \
+              "AND project_join.remove_flag = %s"
+
+        result = query_result_convert.origin_db_query(sql, [teamId, removeFlag])
+        print(result)
+        return ApiResponse.ok_simple(data=result, count=result.__len__())
+
+    def applyStatus(self, datas):
+        try:
+            projectId = datas.get('project_id', None)
+            userId = datas.get('user_id', None)
+            status = datas.get('remove_flag', None)
+            result = query_result_convert.origin_db_query('update project_join set remove_flag=%s where user_id=%s and project_id=%s', [status, userId, projectId])
+            print(result)
+        except Exception as e:
+            print(e)
+            return False

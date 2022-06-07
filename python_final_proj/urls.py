@@ -34,6 +34,8 @@ urlpatterns = [
     path('datavisual/', admin.DataVisual.as_view()),
     path('projectinfo/', admin.ProjectInfoView.as_view()),
     path('createProject/', admin.CreateProjectView.as_view()),
+    path('showTeamMem/', admin.ShowYourTeamMem.as_view()),
+    path('projectMemCheck/', admin.ProjectMemCheckView.as_view()),
 
 
     path('index/', web.AppIndex.as_view()),

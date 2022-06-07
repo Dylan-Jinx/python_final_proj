@@ -78,15 +78,7 @@
 
         {# 每行工具栏的触发事件 #}
 
-        function teamApplyReload() {
-            mainTable.reload('volunteer_team_check_table', {
-                url: '../manageteam?method=getAllInfo',
-                page: {
-                    curr: 1
-                },
-                where: {}
-            }, true)
-        }
+
 
         function memberApplySuccess(userId, flag) {
             $.ajax({
