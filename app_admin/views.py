@@ -54,7 +54,7 @@ class LoginView(View):
         team = VolunteerTeam.objects.filter(team_login_name=phone_data, team_pwd=encode_pwd).first()
         if team is not None:
             request.session["team_id"] = team.team_id
-            request.session["nick_name"] = team.team_name
+            request.session["team_name"] = team.team_name
             return HttpResponseRedirect("/admin/index/")
         else:
             return render(request, "admin/login.html", {"loginTip": "用户名或密码输入错误"})
@@ -440,14 +440,15 @@ class TeamManageView(View):
         teamId = request.GET.get('team_id')
         page = request.GET.get("page")
         limit = request.GET.get("limit")
-        datas = TeamMember.objects.filter(remove_flag=removeFlag).all()
-        print(datas)
+        # datas = TeamMember.objects.filter(remove_flag=removeFlag).all()
+        # print(datas)
 
         sql = "SELECT volunteer.user_name,volunteer.phone,volunteer.phone,volunteer.user_mail,volunteer.service_area,volunteer_team.team_name,join_time,team_member.team_id,team_member.user_id" \
               " FROM volunteer,volunteer_team,team_member " \
-              "WHERE  team_member.remove_flag = %s"
+              "WHERE team_member.team_id = volunteer_team.team_id AND volunteer.user_id = team_member.user_id AND team_member.team_id = %s AND team_member.remove_flag = %s"
 
         result = query_result_convert.origin_db_query(sql, [teamId, removeFlag])
+        print(result)
         return ApiResponse.ok_simple(data=result, count=result.__len__())
 
     def applyStatus(self, datas):
@@ -792,7 +793,6 @@ class ProjectInfoView(View):
             return JsonResponse(result)
         return render(request, "admin/teamprojectinfo.html")
 
-
     def get_all_project_page(self, request):
         try:
             teamId = request.GET.get('team_id')
@@ -818,7 +818,7 @@ class CreateProjectView(View):
     def get(self, request):
         if str(request.GET.get('method')).__eq__('add'):
             self.addProject(request)
-            return JsonResponse(ApiResponse.api_reponse("操作成功",count=0))
+            return JsonResponse(ApiResponse.api_reponse("操作成功", count=0))
         else:
             serviceType = DictDetail.objects.filter(dict_code='6b2f6f24a23a4b079ed19b97eab2ce4b')
             return render(request, "admin/project_add.html", {"serviceType": serviceType})
@@ -855,3 +855,12 @@ class CreateProjectView(View):
             project_info=projectInfo
         )
 
+
+class ShowYourTeamMem(View):
+    def dispatch(self, request, *args, **kwargs):
+        result = super(ShowYourTeamMem, self).dispatch(request, *args, **kwargs)
+        return result
+
+    def get(self, request):
+
+        return render(request, "admin/showYourTeamMem.html")
